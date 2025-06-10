@@ -1,18 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegisterUserController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\HomeController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+
+// Public routes: Registration & Login (no auth required)
+Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
+Route::post('/register', [RegisterUserController::class, 'store']);
+Route::get('/login', [SessionController::class, 'index'])->name('login');
+Route::post('/login', [SessionController::class, 'store']);
+
+// Logout requires authentication
+Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
+
+
+Route::get('/', [HomeController::class, 'index'])->name('home');

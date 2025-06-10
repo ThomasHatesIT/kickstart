@@ -1,0 +1,1 @@
+<input {{$attributes->merge(['class' => 'form-control border rounded px-3 py-2 focus:border-primary focus:shadow focus:outline-none'])}}>
