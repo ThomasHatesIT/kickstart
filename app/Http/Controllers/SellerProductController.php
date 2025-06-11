@@ -107,4 +107,132 @@ class SellerProductController extends Controller
         return redirect()->route('seller.products.index')
                          ->with('success', 'Product created successfully! It is now pending admin approval.');
     }
+
+
+
+    public function edit(Product $product) 
+{
+
+
+
+    if ($product->seller_id !== auth()->id()) {
+        abort(403, 'Unauthorized Action');
+    }
+
+    $categories = Category::orderBy('name')->get();
+
+    return view('seller.products.edit', [
+        'product' => $product,
+        'categories' => $categories
+    ]);
+}
+
+
+
+public function update(Request $request, Product $product)
+{
+    // 1. AUTHORIZE
+    if ($product->seller_id !== auth()->id()) {
+        abort(403, 'Unauthorized Action');
+    }
+
+    // 2. VALIDATE THE DATA
+    // We need to ensure a user doesn't try to remove AND upload an image.
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
+        // ... other fields ...
+        'brand' => 'nullable|string|max:100',
+        'color' => 'nullable|string|max:50',
+        'remove_primary_image' => 'nullable|boolean', // Validate our new checkbox
+        'primary_image' => [ // Use an array for complex rules
+            'nullable',
+            'image',
+            'mimes:jpeg,png,jpg,webp',
+            'max:2048',
+            // IMPORTANT: Prohibit uploading if the "remove" box is checked
+            'prohibited_if:remove_primary_image,true',
+        ],
+    ], [
+        // Custom error message for a better user experience
+        'primary_image.prohibited_if' => 'You cannot upload a new image and remove the current one at the same time.'
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        // 3. HANDLE IMAGE REMOVAL (if checkbox was ticked)
+        if ($request->boolean('remove_primary_image')) {
+            $primaryImage = $product->images->firstWhere('is_primary', true);
+            if ($primaryImage) {
+                // Delete the file from storage
+                Storage::disk('public')->delete($primaryImage->image_path);
+                // Delete the record from the database
+                $primaryImage->delete();
+            }
+        } 
+        // 4. HANDLE NEW IMAGE UPLOAD (if a new file was provided)
+        // This 'else if' is safe because our validation prevents both from being true
+        else if ($request->hasFile('primary_image')) { 
+            // This is the same logic as before: delete the old and store the new
+            $oldPrimaryImage = $product->images->firstWhere('is_primary', true);
+            if ($oldPrimaryImage) {
+                Storage::disk('public')->delete($oldPrimaryImage->image_path);
+                $oldPrimaryImage->delete();
+            }
+
+            $imagePath = $request->file('primary_image')->store('products', 'public');
+            $product->images()->create([
+                'image_path' => $imagePath,
+                'is_primary' => true,
+            ]);
+        }
+
+        // 5. UPDATE THE PRODUCT'S OTHER DETAILS
+        $product->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            // ... other fields ...
+            'brand' => $validated['brand'],
+            'color' => $validated['color'],
+        ]);
+
+        DB::commit();
+
+    } catch (\Exception $e) {
+        // ... (your existing catch block is fine) ...
+    }
+
+    return redirect()->route('seller.products.index')
+                     ->with('success', 'Product updated successfully!');
+}
+ public function destroy(Product $product)
+    {
+        // 1. AUTHORIZE THE ACTION
+        // Ensure the logged-in user is the owner of the product.
+        if ($product->seller_id !== auth()->id()) {
+            abort(403, 'Unauthorized Action');
+        }
+
+        try {
+            // 2. DELETE ASSOCIATED IMAGE FILES FROM STORAGE
+            // It's important to delete files before the database record.
+            foreach ($product->images as $image) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+
+            // 3. DELETE THE PRODUCT FROM THE DATABASE
+            // This will also automatically delete the related 'product_images' records
+            // if you have set up cascading deletes in your migration (see tip below).
+            $product->delete();
+
+        } catch (\Exception $e) {
+            Log::error('Product deletion failed: ' . $e->getMessage());
+            return back()->with('error', 'There was a problem deleting the product.');
+        }
+
+        // 4. REDIRECT WITH A SUCCESS MESSAGE
+        return redirect()->route('seller.products.index')
+                         ->with('success', 'Product has been deleted successfully.');
+    }
 }

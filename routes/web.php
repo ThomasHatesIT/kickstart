@@ -22,6 +22,25 @@ Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth'
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
-Route::get('/seller/products', [SellerProductController::class, 'index'])->name('seller.products.index');
-Route::get('/products/create', [SellerProductController::class, 'create'])->name('seller.products.create');
-Route::post('/seller/products', [SellerProductController::class, 'store'])->name('seller.products.store');
+Route::middleware('auth')->prefix('seller/products')->name('seller.products.')->group(function () {
+    
+    // GET /seller/products
+    Route::get('/', [SellerProductController::class, 'index'])->name('index');
+
+    // GET /seller/products/create
+    Route::get('/create', [SellerProductController::class, 'create'])->name('create');
+
+    // POST /seller/products
+    Route::post('/', [SellerProductController::class, 'store'])->name('store');
+    
+    // GET /seller/products/{product}/edit
+    Route::get('/{product}/edit', [SellerProductController::class, 'edit'])->name('edit');
+    
+    // PUT /seller/products/{product}
+    Route::put('/{product}', [SellerProductController::class, 'update'])->name('update');
+    
+    // You can add the destroy route here later
+    // DELETE /seller/products/{product}
+    Route::delete('/{product}', [SellerProductController::class, 'destroy'])->name('destroy');
+
+});

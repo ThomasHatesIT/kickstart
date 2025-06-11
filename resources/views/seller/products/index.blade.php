@@ -74,9 +74,9 @@
 
                                 {{-- Action Buttons --}}
                                 <td class="text-end">
-                                    <a href="{{-- route('seller.products.edit', $product) --}}" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
+                                    <a href="{{ route('seller.products.edit', $product) }}" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
                                     
-                                    <form action="{{-- route('seller.products.destroy', $product) --}}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                    <form action="{{ route('seller.products.destroy', $product) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
