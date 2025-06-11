@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterUserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SellerProductController;
 
 
 
@@ -22,5 +22,6 @@ Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth'
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
-Route::get('/seller/products', [ProductController::class, 'index'])->name('seller.products.index');
-Route::get('/products/create', [ProductController::class, 'create']);
+Route::get('/seller/products', [SellerProductController::class, 'index'])->name('seller.products.index');
+Route::get('/products/create', [SellerProductController::class, 'create'])->name('seller.products.create');
+Route::post('/seller/products', [SellerProductController::class, 'store'])->name('seller.products.store');

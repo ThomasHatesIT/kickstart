@@ -3,100 +3,103 @@
 @section('title', 'Add New Product')
 
 @section('content')
-    <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold mb-6">Create a New Product Listing</h2>
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h4 class="mb-0">Create a New Product Listing</h4>
+        </div>
+        <div class="card-body">
+            {{-- The form needs multipart/form-data for the file upload to work --}}
+            <form action="{{ route('seller.products.store')}} " method="POST" enctype="multipart/form-data">
+                @csrf
 
-        {{-- The form needs multipart/form-data for the file upload to work --}}
-        <form action="{{-- route('seller.products.store') --}}" method="POST" enctype="multipart/form-data">
-            @csrf
+                <div class="row g-3">
+                    <!-- Product Name -->
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Product Name</label>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}" class="form-control @error('name') is-invalid @enderror" required>
+                        @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Product Name -->
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Product Name</label>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    @error('name')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
+                    <!-- Category -->
+                    <div class="col-md-6">
+                        <label for="category_id" class="form-label">Category</label>
+                        <select name="category_id" id="category_id" class="form-select @error('category_id') is-invalid @enderror" required>
+                            <option value="" selected disabled>Select a Category...</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                         @error('category_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Price -->
+                    <div class="col-md-6">
+                        <label for="price" class="form-label">Price (₱)</label>
+                        <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0" class="form-control @error('price') is-invalid @enderror" required>
+                        @error('price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Stock -->
+                    <div class="col-md-6">
+                        <label for="stock" class="form-label">Stock Quantity</label>
+                        <input type="number" name="stock" id="stock" value="{{ old('stock') }}" min="0" class="form-control @error('stock') is-invalid @enderror" required>
+                        @error('stock')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                     
+                    <!-- Brand -->
+                    <div class="col-md-6">
+                        <label for="brand" class="form-label">Brand (e.g., Nike, Adidas)</label>
+                        <input type="text" name="brand" id="brand" value="{{ old('brand') }}" class="form-control @error('brand') is-invalid @enderror">
+                        @error('brand')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Color -->
+                    <div class="col-md-6">
+                        <label for="color" class="form-label">Color</label>
+                        <input type="text" name="color" id="color" value="{{ old('color') }}" class="form-control @error('color') is-invalid @enderror">
+                        @error('color')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="description" id="description" rows="4" class="form-control @error('description') is-invalid @enderror" required>{{ old('description') }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Primary Image -->
+                    <div class="col-12">
+                        <label for="primary_image" class="form-label">Primary Product Image</label>
+                        <input type="file" name="primary_image" id="primary_image" class="form-control @error('primary_image') is-invalid @enderror" required>
+                        <div class="form-text">PNG, JPG, WEBP up to 2MB.</div>
+                         @error('primary_image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
-                <!-- Category -->
-                <div>
-                    <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
-                    <select name="category_id" id="category_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                        <option value="">Select a Category</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                     @error('category_id')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                        Submit for Approval
+                    </button>
                 </div>
-
-                <!-- Price -->
-                <div>
-                    <label for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
-                    <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    @error('price')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Stock -->
-                <div>
-                    <label for="stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
-                    <input type="number" name="stock" id="stock" value="{{ old('stock') }}" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                    @error('stock')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                 
-                <!-- Brand -->
-                <div>
-                    <label for="brand" class="block text-sm font-medium text-gray-700">Brand (e.g., Nike, Adidas)</label>
-                    <input type="text" name="brand" id="brand" value="{{ old('brand') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    @error('brand')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Color -->
-                <div>
-                    <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-                    <input type="text" name="color" id="color" value="{{ old('color') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    @error('color')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Description -->
-                <div class="md:col-span-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea name="description" id="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>{{ old('description') }}</textarea>
-                    @error('description')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Primary Image -->
-                <div class="md:col-span-2">
-                    <label for="primary_image" class="block text-sm font-medium text-gray-700">Primary Product Image</label>
-                    <input type="file" name="primary_image" id="primary_image" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
-                    <p class="text-xs text-gray-500 mt-1">PNG, JPG, WEBP up to 2MB.</p>
-                     @error('primary_image')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="mt-8 flex justify-end">
-                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Submit for Approval
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 @endsection

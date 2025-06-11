@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Seller;
-
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Log;  
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ProductController extends Controller
+class SellerProductController extends Controller
 {
     public function index()
 {
@@ -23,7 +23,7 @@ class ProductController extends Controller
                         ->latest()
                         ->paginate(10); 
 
-    return view('index', compact('products'));
+    return view('seller.products.index', compact('products'));
 }
     /**
      * Show the form for creating a new product.
@@ -99,7 +99,7 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($imagePath);
             }
             // Log the error and return back with an error message
-            // Log::error('Product creation failed: ' . $e->getMessage());
+             Log::error('Product creation failed: ' . $e->getMessage());
             return back()->with('error', 'There was a problem creating the product. Please try again.')->withInput();
         }
 

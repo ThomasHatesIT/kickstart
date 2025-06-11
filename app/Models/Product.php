@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class Product extends Model
 {
     use HasFactory;
@@ -29,6 +30,11 @@ class Product extends Model
         'color',
         'material',
         'category_id',
+
+         // ADD THESE THREE LINES
+        'slug',
+        'seller_id',
+        'status',
     ];
 
     /**
