@@ -1,4 +1,4 @@
-```html
+
 @props(['name'])
 
 @error($name)
@@ -6,4 +6,3 @@
         {{ $message }}
     </p>
 @enderror
-```

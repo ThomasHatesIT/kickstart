@@ -31,11 +31,11 @@ class RegisterUserController extends Controller
         ]); 
 
         // Determine status based on role
-        $status = $attributes['role'] === 'Instructor' ? 'pending' : 'approved';
+        $status = $attributes['role'] === 'seller' ? 'pending' : 'approved';
 
         // Create the user 
         $user = User::create([ 
-            'first_name' => $attributes['first_name'], 
+            'name' => $attributes['name'], 
           
             'email'      => $attributes['email'], 
             'password'   => Hash::make($attributes['password']),

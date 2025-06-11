@@ -14,7 +14,7 @@
                     <!-- First name -->
                     <div class="col-md-6">
                         <x-form-field>
-                            <x-form-label for="name">First name</x-form-label>
+                            <x-form-label for="name">Full Name</x-form-label>
                             <x-form-input type="text" name="name" id="name" value="{{ old('name') }}" required/>
                             <x-form-error name="name" />
                         </x-form-field>
