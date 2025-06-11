@@ -141,7 +141,8 @@ public function update(Request $request, Product $product)
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'description' => 'required|string',
-        // ... other fields ...
+       'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
         'brand' => 'nullable|string|max:100',
         'color' => 'nullable|string|max:50',
         'remove_primary_image' => 'nullable|boolean', // Validate our new checkbox
@@ -192,7 +193,8 @@ public function update(Request $request, Product $product)
         $product->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            // ... other fields ...
+           'price' => $validated['price'],
+            'stock' => $validated['stock'],
             'brand' => $validated['brand'],
             'color' => $validated['color'],
         ]);
@@ -203,8 +205,8 @@ public function update(Request $request, Product $product)
         // ... (your existing catch block is fine) ...
     }
 
-    return redirect()->route('seller.products.index')
-                     ->with('success', 'Product updated successfully!');
+return redirect()->route('seller.products.index')
+                 ->with('success', 'Product updated successfully!');
 }
  public function destroy(Product $product)
     {
@@ -232,7 +234,7 @@ public function update(Request $request, Product $product)
         }
 
         // 4. REDIRECT WITH A SUCCESS MESSAGE
-        return redirect()->route('seller.products.index')
-                         ->with('success', 'Product has been deleted successfully.');
+     return redirect()->route('seller.products.index')
+                 ->with('success', 'Product has been deleted successfully.');
     }
 }

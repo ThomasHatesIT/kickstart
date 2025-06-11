@@ -25,7 +25,7 @@
             </a>
         </li>
         <li>
-            <a href="" class="nav-link {{ request()->routeIs('seller.products.*') ? 'active' : 'text-white' }}">
+            <a href="{{ route('seller.products.index') }}" class="nav-link {{ request()->routeIs('seller.products.*') ? 'active' : 'text-white' }}">
                 <i class="bi bi-box-seam me-2"></i>
                 My Products
             </a>
@@ -56,12 +56,20 @@
                
             </strong>
         </a>
-        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><hr class="dropdown-divider"></li>
-            {{-- In a real app, this would be a form to submit a logout request --}}
-            <li><a class="dropdown-item" href="#">Sign out</a></li>
-        </ul>
+       <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
+    <li><a class="dropdown-item" href="#">Settings</a></li>
+    <li><a class="dropdown-item" href="#">Profile</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+        <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            Sign out
+        </a>
+    </li>
+</ul>
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+    @csrf
+</form>
+
     </div>
 </div>

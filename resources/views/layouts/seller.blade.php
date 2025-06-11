@@ -1,37 +1,57 @@
 {{-- resources/views/layouts/seller.blade.php --}}
+
 <!DOCTYPE html>
-{{-- Add h-100 class to the HTML tag --}}
-<html lang="en" class="h-100"> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Seller Dashboard') - KickStart</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Bootstrap Icons -->
+    {{-- Link to Bootstrap CSS --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{-- Link to Bootstrap Icons --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    {{-- We no longer need the extra style block, Bootstrap classes handle it --}}
+    {{-- You can add your custom CSS file here --}}
+    {{-- <link rel="stylesheet" href="{{ asset('css/seller.css') }}"> --}}
 </head>
-{{-- Add d-flex and h-100 classes to the BODY tag --}}
-<body class="d-flex h-100">
-
-    {{-- This sidebar will now automatically stretch to the full height of the body --}}
-    @include('partials._seller_sidebar')
-
-    <!-- Main Content Area -->
-    {{-- The 'flex-grow-1' class ensures this area takes up all remaining horizontal space --}}
-    <main class="container-fluid p-4 flex-grow-1">
-        <h1 class="h3 mb-4">@yield('title')</h1>
+<body>
+    {{-- MAIN FLEX CONTAINER --}}
+    {{--
+        HERE IS THE FIX: Added `min-vh-100`
+        This makes the container take up at least 100% of the viewport height.
+    --}}
+    <div class="d-flex min-vh-100">
         
-        @include('partials._alerts')
-        
-        @yield('content')
-    </main>
+        {{-- 1. THE SIDEBAR --}}
+        {{-- It will now stretch to fill the full height of its parent --}}
+        @include('partials._seller_sidebar')
 
-    <!-- Bootstrap JS -->
+        {{-- 2. THE MAIN CONTENT AREA --}}
+        {{-- This will also stretch to the full height --}}
+        <main class="flex-grow-1 p-4" style="background-color: #f8f9fa;">
+                    {{-- Success Alert --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        {{-- Error Alert --}}
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+            @yield('content')
+        </main>
+        
+    </div>
+
+    {{-- Link to Bootstrap JS (and Popper.js) for dropdowns, etc. --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

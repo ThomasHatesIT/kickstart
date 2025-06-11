@@ -50,7 +50,7 @@
                                 </td>
                                 
                                 {{-- Price --}}
-                                <td>${{ number_format($product->price, 2) }}</td>
+                                <td>₱{{ number_format($product->price, 2) }}</td>
                                 
                                 {{-- Stock --}}
                                 <td>{{ $product->stock }}</td>
