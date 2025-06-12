@@ -53,7 +53,7 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             {{-- DYNAMIC DASHBOARD LINK BASED ON ROLE --}}
                             @if(Auth::user()->hasRole('admin'))
-                                <li><a class="dropdown-item" href="{{-- route('admin.dashboard') --}}#">Admin Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
                             @elseif(Auth::user()->hasRole('seller'))
                                 <li><a class="dropdown-item" href="{{ route('seller.products.index') }}">Seller Dashboard</a></li>
                             @else
