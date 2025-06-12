@@ -95,6 +95,9 @@
                 </div>
 
                 <div class="mt-4 text-end">
+                     <a href="{{ route('seller.products.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Products
+        </a>
                     <button type="submit" class="btn btn-primary px-4">
                         Submit for Approval
                     </button>

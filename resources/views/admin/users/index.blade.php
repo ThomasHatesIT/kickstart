@@ -4,11 +4,11 @@
 
 @section('content')
 <div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header">
         <h4 class="mb-0">All Registered Users</h4>
     </div>
     <div class="card-body">
-        {{-- Include the partial for displaying session alerts --}}
+        {{-- Include the partial for displaying session flash messages --}}
         @include('partials._alerts')
 
         {{-- Filter Form --}}
@@ -64,10 +64,7 @@
                             <th>{{ $user->id }}</th>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
-                            <td>{{-- implode(', ', $user->getRoleNames()->toArray()) --}}
-                                {{-- Using first() is cleaner if users only have one role --}}
-                                {{ ucfirst($user->getRoleNames()->first() ?? 'N/A') }}
-                            </td>
+                            <td>{{ ucfirst($user->getRoleNames()->first() ?? 'N/A') }}</td>
                             <td>
                                 @if ($user->status == 'approved')
                                     <span class="badge bg-success">Approved</span>
@@ -82,37 +79,36 @@
                             <td>{{ $user->created_at->format('d M, Y') }}</td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    {{-- Don't allow actions on the currently logged-in admin --}}
-                                    @if($user->id !== auth()->id())
+                                    {{-- Do not allow actions on other Admins or the logged-in user --}}
+                                    @if($user->id !== auth()->id() && !$user->hasRole('Admin'))
                                         {{-- 1. Seller Approval Logic --}}
                                         @if ($user->hasRole('seller') && $user->status == 'pending')
-                                            <form action="{{ route('admin.sellers.approve', $user->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('admin.sellers.approve', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to approve this seller?');">
                                                 @csrf @method('PATCH')
                                                 <button type="submit" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Approve Seller">Approve</button>
                                             </form>
-                                            <form action="{{ route('admin.sellers.reject', $user->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('admin.sellers.reject', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to REJECT this seller?');">
                                                 @csrf @method('PATCH')
                                                 <button type="submit" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Reject Seller">Reject</button>
                                             </form>
-
                                         {{-- 2. Banning Logic --}}
                                         @elseif ($user->status == 'approved')
-                                            <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to BAN this user? They will not be able to log in.');">
                                                 @csrf @method('PATCH')
                                                 <button type="submit" class="btn btn-sm btn-dark" data-bs-toggle="tooltip" title="Ban User">Ban</button>
                                             </form>
-
                                         {{-- 3. Unbanning Logic --}}
                                         @elseif ($user->status == 'banned')
-                                            <form action="{{ route('admin.users.unban', $user->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('admin.users.unban', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to UNBAN this user? They will regain access.');">
                                                 @csrf @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Unban User">Unban</button>
+                                                <button type="submit" class="btn btn-sm btn-info text-dark" data-bs-toggle="tooltip" title="Unban User">Unban</button>
                                             </form>
                                         @else
                                             <span>—</span>
                                         @endif
                                     @else
-                                        <span class="text-muted fst-italic">You</span>
+                                        {{-- Show this for the logged-in user or other admins --}}
+                                        <span class="text-muted fst-italic">No actions</span>
                                     @endif
                                 </div>
                             </td>
@@ -133,6 +129,7 @@
 @endsection
 
 @push('scripts')
+{{-- Optional: Initialize Bootstrap tooltips for better UX --}}
 <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

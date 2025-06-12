@@ -25,7 +25,7 @@ Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth'
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
-Route::middleware('auth')->prefix('seller/products')->name('seller.products.')->group(function () {
+Route::middleware('auth','role:seller')->prefix('seller/products')->name('seller.products.')->group(function () {
     // GET /seller/products
     Route::get('/', [SellerProductController::class, 'index'])->name('index');
     // GET /seller/products/create

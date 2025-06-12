@@ -20,39 +20,48 @@ class RegisterUserController extends Controller
         ]); 
     } 
 
-    public function store(Request $request) 
-    { 
-        $attributes = $request->validate([ 
-            'name' => ['required', 'string', 'max:255'], 
-           
-            'email'      => ['required', 'email', 'unique:users,email'], 
-            'password'   => ['required', Password::default(), 'confirmed'], 
-            'role'       => ['required', 'string', 'exists:roles,name'], 
-        ]); 
+      public function store(Request $request)
+    {
+        // 1. VALIDATE THE INCOMING REQUEST
+        $attributes = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'role'     => ['required', 'string', 'exists:roles,name'],
+        ]);
 
-        // Determine status based on role
+        // 2. CREATE THE USER
+        // Determine the user's initial status based on their role
         $status = $attributes['role'] === 'seller' ? 'pending' : 'approved';
 
-        // Create the user 
-        $user = User::create([ 
-            'name' => $attributes['name'], 
-          
-            'email'      => $attributes['email'], 
-            'password'   => Hash::make($attributes['password']),
-            'status'     => $status,
-        ]); 
+        $user = User::create([
+            'name'     => $attributes['name'],
+            'email'    => $attributes['email'],
+            'password' => Hash::make($attributes['password']),
+            'status'   => $status,
+        ]);
 
-        // Assign role using Spatie
-        $user->assignRole($attributes['role']); 
+        // 3. ASSIGN THE ROLE TO THE NEW USER
+        $user->assignRole($attributes['role']);
 
-        // Handle different scenarios based on role
-        if ($attributes['role'] === 'seller') {
-            // Don't log in instructor users automatically
-            return redirect('/login')->with('message', 'Registration successful! Your account is pending approval. You will be notified once an admin approves your account.');
+        // 4. HANDLE CONDITIONAL LOGIN AND REDIRECT
+        // This is the clean, logical way to handle the flow.
+
+        if ($user->hasRole('seller')) {
+            // A seller's account is pending, so DO NOT log them in.
+            // Redirect them to the login page with a success message.
+            return redirect('/login')
+                ->with('success', 'Registration successful! Your account is pending admin approval. You will be notified via email once it is approved.');
         } else {
-            // Log in other users normally (students, etc.)
-            Auth::login($user); 
-            return redirect('/')->with('message', 'User registered and logged in successfully!'); 
+            // For any other role (e.g., 'buyer'), log them in immediately.
+            Auth::login($user);
+
+            // Regenerate the session ID for security (prevents session fixation)
+            $request->session()->regenerate();
+
+            // Redirect the newly logged-in user directly to the homepage.
+            return redirect('/')
+                ->with('success', 'Welcome! You have been registered and successfully logged in.');
         }
-    } 
+    }
 }

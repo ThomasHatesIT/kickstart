@@ -6,10 +6,8 @@
 
     {{-- NEW: Clean header row for the page --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h4 mb-0">Edit Product</h2>
-        <a href="{{ route('seller.products.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Back to Products
-        </a>
+        <h2 class="h1 mb-0">Edit Product</h2>
+       
     </div>
 
     <div class="card shadow-sm">
@@ -125,9 +123,13 @@
 
                 {{-- MOVED: The update button is now here at the end of the form --}}
                 <div class="mt-4 text-end">
+                     <a href="{{ route('seller.products.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Products
+        </a>
                     <button type="submit" class="btn btn-primary px-4">
                         Update Product
                     </button>
+                    
                 </div>
             </form>
         </div>
