@@ -26,6 +26,7 @@
                         <tr>
                             <th scope="col">Product</th>
                             <th scope="col">Seller</th>
+                              <th scope="col">Email</th>
                             <th scope="col">Price</th>
                             <th scope="col" class="text-center">Actions</th>
                         </tr>
@@ -47,6 +48,7 @@
                                     </div>
                                 </td>
                                 <td>{{ $product->seller->name ?? 'N/A' }}</td>
+                                 <td>{{ $product->seller->email ?? 'N/A' }}</td>
                                 <td>₱{{ number_format($product->price, 2) }}</td>
                                 <td class="text-center">
                                     <div class="btn-group">

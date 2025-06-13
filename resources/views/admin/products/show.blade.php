@@ -31,6 +31,7 @@
                         <div>
                             <h3 class="mb-1 text-dark">{{ $product->name }}</h3>
                             <p class="text-muted mb-0">Product Information & Details</p>
+                              <p class="text-muted mb-0">Product Seller {{route('')}}</p>
                         </div>
                     </div>
                 </div>
@@ -219,14 +220,14 @@
                             </div>
                             
                             <div class="d-flex gap-2 justify-content-center">
-                                <form action="" method="POST" class="d-inline">
+                                <form action="{{ route('admin.products.approve', $product) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-success shadow-sm flex-fill" onclick="return confirm('Are you sure you want to approve this product?')">
                                         <i class="bi bi-check-circle me-2"></i> Approve Product
                                     </button>
                                 </form>
-                                <form action="" method="POST" class="d-inline">
+                                <form action="{{ route('admin.products.reject', $product) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-danger shadow-sm flex-fill" onclick="return confirm('Are you sure you want to reject this product?')">

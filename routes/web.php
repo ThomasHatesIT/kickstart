@@ -49,6 +49,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::get('/', [AdminController::class, 'index'])->name('dashboard');
      // User Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
     Route::patch('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
     Route::patch('/users/{user}/unban', [AdminUserController::class, 'unban'])->name('users.unban');
 
@@ -58,6 +59,8 @@ Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
 Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('products.show');
+Route::patch('/products/{product}/approve', [AdminProductController::class, 'approve'])->name('products.approve');
+Route::patch('/products/{product}/reject', [AdminProductController::class, 'reject'])->name('products.reject');
 
 
 

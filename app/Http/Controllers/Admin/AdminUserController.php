@@ -97,5 +97,11 @@ class AdminUserController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', "User '{$user->name}' has been unbanned.");
     }
+    public function show (User $user){
+
+        return view('admin.users.show',[
+            'user' => $user
+        ]);
+    }
 
 }

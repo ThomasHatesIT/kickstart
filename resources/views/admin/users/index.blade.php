@@ -79,8 +79,9 @@
                             <td>{{ $user->created_at->format('d M, Y') }}</td>
                             <td class="text-center">
                                 <div class="btn-group">
+                                     <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Details">View</a>
                                     {{-- Do not allow actions on other Admins or the logged-in user --}}
-                                    @if($user->id !== auth()->id() && !$user->hasRole('Admin'))
+                                    @if($user->id !== auth()->id() && !$user->hasRole('admin'))
                                         {{-- 1. Seller Approval Logic --}}
                                         @if ($user->hasRole('seller') && $user->status == 'pending')
                                             <form action="{{ route('admin.sellers.approve', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to approve this seller?');">
