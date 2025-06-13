@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use App\Models\Review;
+use App\Models\ProductImage;
 
 class Product extends Model
 {
@@ -103,4 +104,19 @@ class Product extends Model
     {
         return 'slug';
     }
+     public function getAverageRatingAttribute(): float
+    {
+        // The 'avg' aggregate function will return null if there are no reviews.
+        // The null coalescing operator '??' defaults it to 0.
+        return round($this->reviews()->avg('rating') ?? 0, 1);
+    }
+      public function getReviewsCountAttribute(): int
+    {
+        // Using `count()` is efficient here.
+        return $this->reviews()->count();
+    }
+     public function reviews(): HasMany
+{
+    return $this->hasMany(Review::class);
+}
 }

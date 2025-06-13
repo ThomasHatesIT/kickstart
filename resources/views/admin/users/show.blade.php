@@ -7,9 +7,9 @@
     {{-- Page Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">User Details</h1>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-1"></i>
-            Back to All Users
+            Back 
         </a>
     </div>
 

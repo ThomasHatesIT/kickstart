@@ -28,11 +28,22 @@
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
                             <i class="bi bi-box-seam text-primary fs-4"></i>
                         </div>
-                        <div>
-                            <h3 class="mb-1 text-dark">{{ $product->name }}</h3>
-                            <p class="text-muted mb-0">Product Information & Details</p>
-                              <p class="text-muted mb-0">Product Seller {{route('')}}</p>
-                        </div>
+                        <div class="mb-4">
+    <!-- Product Name -->
+    <h3 class="mb-1 text-dark">{{ $product->name }}</h3>
+    
+    <!-- Subtitle -->
+    <p class="text-muted">Product Information & Details</p>
+
+    <!-- Seller Info -->
+    <div class="d-flex align-items-center gap-2">
+        <p class="text-muted mb-0">Product Seller:</p>
+        <a href="{{ route('admin.users.show', $product->seller->id) }}" class="btn btn-outline-dark btn-sm">
+            View Seller
+        </a>
+    </div>
+</div>
+
                     </div>
                 </div>
                 
