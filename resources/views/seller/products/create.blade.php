@@ -74,6 +74,32 @@
                         @enderror
                     </div>
 
+
+                     <div class="col-12">
+                        <label class="form-label">Available Sizes</label>
+                        <div class="d-flex flex-wrap gap-2 border p-2 rounded @error('sizes') is-invalid @enderror">
+                            @foreach ($sizes as $size)
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="sizes[]"
+                                           value="{{ $size }}"
+                                           id="size_{{ str_replace('.', '_', $size) }}"
+                                           {{-- Check if this size was in the old input after a validation failure --}}
+                                           {{ in_array($size, old('sizes', [])) ? 'checked' : '' }}>
+                                    
+                                    <label class="form-check-label" for="size_{{ str_replace('.', '_', $size) }}">
+                                        {{ $size }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                        @error('sizes')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    
                     <!-- Description -->
                     <div class="col-12">
                         <label for="description" class="form-label">Description</label>

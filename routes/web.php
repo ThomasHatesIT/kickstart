@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\AdminProductController;
 
 
 
+
 // Public routes: Registration & Login (no auth required)
 Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
 Route::post('/register', [RegisterUserController::class, 'store']);
@@ -54,6 +55,12 @@ Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     // Seller Status (Assuming these are in AdminUserController too, or move them)
     Route::patch('/sellers/{user}/approve', [AdminUserController::class, 'approveSeller'])->name('sellers.approve');
      Route::patch('/sellers/{user}/reject', [AdminUserController::class, 'rejectSeller'])->name('sellers.reject');
+
+Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('products.show');
+
+
+
 });
   
 

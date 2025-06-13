@@ -81,6 +81,34 @@
                         @enderror
                     </div>
 
+                         <div class="col-12">
+    <label class="form-label">Available Sizes</label>
+    <div class="d-flex flex-wrap gap-2 border p-2 rounded @error('sizes') is-invalid @enderror">
+        @foreach ($sizes as $size)
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="sizes[]"
+                       value="{{ $size }}"
+                       id="size_{{ str_replace('.', '_', $size) }}"
+                       
+                       {{-- THIS IS THE KEY LOGIC FOR AN EDIT FORM --}}
+                       {{ in_array($size, old('sizes', $product->sizes ?? [])) ? 'checked' : '' }}>
+                
+                <label class="form-check-label" for="size_{{ str_replace('.', '_', $size) }}">
+                    {{ $size }}
+                </label>
+            </div>
+        @endforeach
+    </div>
+    @error('sizes')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+    @error('sizes.*') {{-- For individual invalid size errors --}}
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+</div>
+
                     <!-- Description -->
                     <div class="col-12">
                         <label for="description" class="form-label">Description</label>

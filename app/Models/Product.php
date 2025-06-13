@@ -37,6 +37,10 @@ class Product extends Model
         'status',
     ];
 
+     public const AVAILABLE_SIZES = [
+        '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10', '10.5', '11', '11.5', '12', '13'
+    ];
+
     /**
      * The attributes that should be cast.
      * This automatically converts the 'sizes' JSON column from the database
@@ -50,7 +54,7 @@ class Product extends Model
     ];
 
     /**
-     * Get the seller (a User) that owns the Product.
+     * Get the seller (a User) that owns the Product.s
      */
     public function seller(): BelongsTo
     {

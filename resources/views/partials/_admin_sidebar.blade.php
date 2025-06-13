@@ -26,7 +26,8 @@
         </li>
         <li>
             <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : 'text-white' }}">
-                <i class="bi bi-box-seam me-2"></i>
+             <i class="bi bi-person-gear me-2"></i>
+
               Manage Users
             </a>
         </li>
@@ -35,6 +36,13 @@
                 <i class="bi bi-card-list me-2"></i>
                 Manage Sellers
             </a>
+        </li>
+         <li>
+         <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : 'text-white' }}">
+    <i class="bi bi-box-seam me-2"></i>
+    Manage Products
+</a>
+
         </li>
         <li>
             <a href="#" class="nav-link text-white">
