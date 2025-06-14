@@ -89,7 +89,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-bag me-2"></i>My Orders</a></li>
+                            <li><a class="dropdown-item" href="{{ route('users.orders.index') }}"><i class="fas fa-shopping-bag me-2"></i>My Orders</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-heart me-2"></i>Wishlist</a></li>
                             @if(Auth::user()->role === 'seller')
                                 <li><hr class="dropdown-divider"></li>

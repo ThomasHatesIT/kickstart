@@ -6,6 +6,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SellerProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -49,6 +50,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+
+
+     // User Order Routes
+    Route::get('/orders', [OrderController::class, 'index'])->name('users.orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('users.orders.show');
+    Route::get('/orders/{order}/download', [OrderController::class, 'downloadInvoice'])->name('users.orders.download');
 });
 
 // Seller routes (auth & role required)
