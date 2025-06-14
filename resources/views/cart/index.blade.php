@@ -2,6 +2,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container my-5">
     <h1 class="mb-4">Your Shopping Cart</h1>
 
@@ -87,7 +88,7 @@
                                 <span>₱{{ number_format($total, 2) }}</span>
                             </li>
                         </ul>
-                        <a href="" class="btn btn-primary w-100 mt-3">Proceed to Checkout</a>
+                        <a href="{{ route('checkout.index') }}" class="btn btn-primary w-100 mt-3">Proceed to Checkout</a>
                     </div>
                 </div>
             </div>

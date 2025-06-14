@@ -1,79 +1,113 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
+{{-- resources/views/partials/_navbar.blade.php --}}
+<nav class="navbar navbar-expand-lg navbar-light bg-white">
     <div class="container">
-        {{-- Brand/Logo --}}
+        <!-- Brand/Logo -->
         <a class="navbar-brand" href="{{ route('home') }}">
-            <i class="fas fa-shoe-prints me-2"></i>
-            KickStart
+            <i class="fas fa-shopping-bag me-2"></i>KickStart
         </a>
 
-        {{-- Mobile Toggle Button --}}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        {{-- Main Navigation Links --}}
-        <div class="collapse navbar-collapse" id="main-nav">
-            {{-- Left Aligned Links --}}
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Left Side Links -->
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
+                    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
                 </li>
                 <li class="nav-item">
-                    {{-- Assuming you have a route named 'products.index' for the shop page --}}
-                    <a class="nav-link {{ request()->routeIs('products.index') ? 'active' : '' }}" href="{{-- route('products.index') --}}#">Shop</a>
+                    <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="">
+                        <i class="fas fa-th-large me-1"></i>Products
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-list me-1"></i>Categories
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-running me-2"></i>Athletic Shoes</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-tie me-2"></i>Dress Shoes</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-hiking me-2"></i>Casual Shoes</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View All</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-info-circle me-1"></i>About
+                    </a>
                 </li>
             </ul>
 
-            {{-- Right Aligned Links --}}
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+            <!-- Right Side Links -->
+            <ul class="navbar-nav">
+                <!-- Search Form (Optional) -->
+                <li class="nav-item me-3">
+                    <form class="d-flex" action="#" method="GET">
+                        <div class="input-group">
+                            <input class="form-control form-control-sm" type="search" placeholder="Search products..." aria-label="Search" name="search" style="min-width: 200px;">
+                            <button class="btn btn-outline-primary btn-sm" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </li>
+
+                <!-- Cart -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{{route('cart.index') }}#">
+                    <a class="nav-link position-relative" href="{{ route('cart.index') }}">
                         <i class="fas fa-shopping-cart"></i>
-                        {{-- Add a badge for cart items. You can make this dynamic later. --}}
-                        <span class="badge bg-primary rounded-pill ms-1">0</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6em;">
+                            3 {{-- This should be dynamic cart count --}}
+                        </span>
+                        Cart
                     </a>
                 </li>
 
                 @guest
-                    {{-- Show these links only if the user is a GUEST --}}
+                    <!-- Login/Register for guests -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Login</a>
+                        <a class="nav-link" href="{{ route('login') ?? '#' }}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('register') }}" class="btn btn-primary ms-2">Register</a>
+                        <a class="nav-link" href="{{ route('register') ?? '#' }}">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
                     </li>
-                @endguest
-
-                @auth
-                    {{-- Show this dropdown only if the user is LOGGED IN --}}
+                @else
+                    <!-- User Dropdown for authenticated users -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ Auth::user()->name }}
+                            <i class="fas fa-user-circle me-1"></i>{{ Auth::user()->name }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            {{-- DYNAMIC DASHBOARD LINK BASED ON ROLE --}}
-                            @if(Auth::user()->hasRole('admin'))
-                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
-                            @elseif(Auth::user()->hasRole('seller'))
-                                <li><a class="dropdown-item" href="{{ route('seller.products.index') }}">Seller Dashboard</a></li>
-                            @else
-                                {{-- Default for 'Buyer' or any other user role --}}
-                                <li><a class="dropdown-item" href="{{-- route('user.dashboard') --}}#">My Dashboard</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-bag me-2"></i>My Orders</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-heart me-2"></i>Wishlist</a></li>
+                            @if(Auth::user()->role === 'seller')
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-store me-2"></i>Seller Dashboard</a></li>
                             @endif
-
-                            <li><a class="dropdown-item" href="{{-- route('user.orders.index') --}}#">My Orders</a></li>
-                            <li><a class="dropdown-item" href="{{-- route('user.profile') --}}#">Profile Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                {{-- Secure Logout Form --}}
-                                <form method="POST" action="{{ route('logout') }}">
+                                <a class="dropdown-item" href="{{ route('logout') ?? '#' }}" 
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') ?? '#' }}" method="POST" class="d-none">
                                     @csrf
-                                    <button type="submit" class="dropdown-item">Logout</button>
                                 </form>
                             </li>
                         </ul>
                     </li>
-                @endauth
+                @endguest
             </ul>
         </div>
     </div>
