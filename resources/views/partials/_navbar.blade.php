@@ -27,7 +27,7 @@
             {{-- Right Aligned Links --}}
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{-- route('cart.index') --}}#">
+                    <a class="nav-link" href="{{route('cart.index') }}#">
                         <i class="fas fa-shopping-cart"></i>
                         {{-- Add a badge for cart items. You can make this dynamic later. --}}
                         <span class="badge bg-primary rounded-pill ms-1">0</span>

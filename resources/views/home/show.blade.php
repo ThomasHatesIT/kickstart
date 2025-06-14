@@ -161,51 +161,100 @@
                 <!-- Enhanced "Buy Box" -->
                 <div class="card border-0 shadow-lg rounded-4 bg-gradient" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                     <div class="card-body p-4">
-                        <form action="" method="POST" id="addToCartForm">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            
-                            {{-- Size Selector --}}
-                            @if(!empty($product->sizes))
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-dark mb-3">
-                                        <i class="bi bi-rulers me-2"></i>Select Size:
-                                    </label>
-                                    <span id="size-error" class="text-danger small ms-2 fw-medium"></span>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        @foreach($product->sizes as $size)
-                                            <input type="radio" class="btn-check" name="size" id="size-{{ $loop->index }}" value="{{ $size }}" autocomplete="off">
-                                            <label class="btn btn-outline-dark rounded-3 px-3 py-2 fw-medium" for="size-{{ $loop->index }}">{{ $size }}</label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
 
-                            {{-- Stock Status & Add to Cart Button --}}
-                            @if($product->stock > 0)
-                                <div class="d-grid mb-3">
-                                    <button type="submit" class="btn btn-primary btn-lg fw-bold py-3 rounded-3 shadow-sm">
-                                        <i class="bi bi-cart-plus-fill me-2"></i>Add to Cart
-                                    </button>
-                                </div>
-                                <div class="text-center">
-                                    @if($product->stock < 10)
-                                        <div class="badge bg-warning text-dark px-3 py-2 rounded-pill">
-                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Only {{ $product->stock }} left in stock
-                                        </div>
-                                    @else
-                                        <div class="badge bg-success px-3 py-2 rounded-pill">
-                                            <i class="bi bi-check-circle-fill me-1"></i>In Stock
-                                        </div>
-                                    @endif
-                                </div>
-                            @else
-                                <div class="alert alert-danger border-0 rounded-3 text-center shadow-sm">
-                                    <i class="bi bi-x-circle-fill me-2"></i>
-                                    <strong>Out of Stock</strong>
-                                </div>
-                            @endif
-                        </form>
+                        @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+{{-- This snippet shows general success/error messages from ->with() --}}
+@include('partials._alerts')
+
+                     
+@auth
+    <form action="{{ route('cart.store') }}" method="POST" id="addToCartForm">
+        @csrf
+        <input type="hidden" name="product_id" value="{{ $product->id }}">
+        
+        {{-- Size Selector --}}
+        @if(!empty($product->sizes))
+            <div class="mb-4">
+                <label class="form-label fw-bold text-dark mb-3">
+                    <i class="bi bi-rulers me-2"></i>Select Size:
+                    <span id="size-error" class="text-danger small ms-2 fw-medium"></span>
+                </label>
+                <div class="d-flex flex-wrap gap-2" id="size-group">
+                    @foreach($product->sizes as $size)
+                        <input type="radio" class="btn-check" name="size" id="size-{{ $loop->index }}" value="{{ $size }}" autocomplete="off">
+                        <label class="btn btn-outline-dark rounded-3 px-3 py-2 fw-medium" for="size-{{ $loop->index }}">{{ $size }}</label>
+                    @endforeach
+                </div>
+            </div>
+        @else
+            <input type="hidden" name="size" value="standard">
+        @endif
+
+        {{-- ======================================================= --}}
+        {{-- === START: NEW QUANTITY SELECTOR BLOCK === --}}
+        {{-- ======================================================= --}}
+        @if($product->stock > 0)
+            <div class="mb-4">
+                <label for="quantity" class="form-label fw-bold text-dark mb-3">
+                    <i class="bi bi-box-seam me-2"></i>Quantity:
+                </label>
+                <div class="input-group input-group-lg" style="max-width: 200px;">
+                    <button class="btn btn-outline-secondary" type="button" id="quantity-minus">-</button>
+                    <input type="number" name="quantity" id="quantity" class="form-control text-center fw-bold" 
+                           value="1" min="1" max="{{ $product->stock }}" required>
+                    <button class="btn btn-outline-secondary" type="button" id="quantity-plus">+</button>
+                </div>
+            </div>
+        @endif
+        {{-- ======================================================= --}}
+        {{-- === END: NEW QUANTITY SELECTOR BLOCK === --}}
+        {{-- ======================================================= --}}
+
+
+        {{-- Stock Status & Add to Cart Button --}}
+        @if($product->stock > 0)
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary btn-lg fw-bold py-3 rounded-3 shadow-sm">
+                    <i class="bi bi-cart-plus-fill me-2"></i>Add to Cart
+                </button>
+            </div>
+            <div class="text-center">
+                @if($product->stock < 10)
+                    <div class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Only {{ $product->stock }} left in stock!
+                    </div>
+                @else
+                    <div class="badge bg-success px-3 py-2 rounded-pill">
+                        <i class="bi bi-check-circle-fill me-1"></i>In Stock
+                    </div>
+                @endif
+            </div>
+        @else
+            <div class="alert alert-danger border-0 rounded-3 text-center shadow-sm" role="alert">
+                <i class="bi bi-x-circle-fill me-2"></i>
+                <strong>Out of Stock</strong>
+            </div>
+        @endif
+    </form>
+@endauth
+
+@guest
+    {{-- Show a clear call-to-action for users who are not logged in --}}
+    <div class="d-grid">
+         <a href="{{ route('login') }}" class="btn btn-primary btn-lg fw-bold py-3 rounded-3 shadow-sm">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Login to Purchase
+        </a>
+    </div>
+@endguest
                     </div>
                 </div>
 
@@ -461,5 +510,40 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+
+   // Wait for the document to be fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        // Find the form, the size radio button group, and the error message span
+        const addToCartForm = document.getElementById('addToCartForm');
+        const sizeError = document.getElementById('size-error');
+        const sizeGroup = document.getElementById('size-group');
+
+        // This event listener triggers when the form is submitted
+        addToCartForm.addEventListener('submit', function (event) {
+            
+            // Check if a radio button with the name 'size' is selected
+            const selectedSize = document.querySelector('input[name="size"]:checked');
+
+            // If no size is selected, and the size group exists on the page
+            if (!selectedSize && sizeGroup) {
+                // 1. Prevent the form from being sent to the server
+                event.preventDefault(); 
+                
+                // 2. Display an error message
+                sizeError.textContent = 'Please select a size.';
+                
+                // 3. Optional: Add a class to highlight the group
+                sizeGroup.classList.add('border', 'border-danger', 'p-2', 'rounded-3');
+            } else {
+                // If a size is selected, clear any previous error message
+                sizeError.textContent = '';
+                if (sizeGroup) {
+                    sizeGroup.classList.remove('border', 'border-danger', 'p-2', 'rounded-3');
+                }
+            }
+        });
+    });
 </script>
 @endpush

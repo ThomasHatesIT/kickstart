@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Review; // Add this at the top
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\CartItem; // Add this
 
 class User extends Authenticatable
 {
@@ -59,6 +60,10 @@ class User extends Authenticatable
     public function isRejected()
     {
         return $this->status === 'rejected';
+    }
+     public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
     }
    
 }

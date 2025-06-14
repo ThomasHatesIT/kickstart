@@ -4,6 +4,21 @@ use Illuminate\Support\Facades\Facade;
 
 return [
 
+    'providers' => [
+    // ... other providers
+    App\Providers\AppServiceProvider::class,
+    App\Providers\AuthServiceProvider::class,
+    // App\Providers\BroadcastServiceProvider::class,
+    App\Providers\EventServiceProvider::class,
+    App\Providers\RouteServiceProvider::class,
+    
+    /*
+     * Our Custom Service Providers...
+     */
+    App\Providers\CartServiceProvider::class, // <-- ADD THIS LINE
+
+],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

@@ -119,4 +119,21 @@ class Product extends Model
 {
     return $this->hasMany(Review::class);
 }
+
+
+public function primaryImageModel()
+{
+    // The logic inside stays the same. It's already robust.
+    return $this->hasOne(ProductImage::class)
+        ->where('is_primary', true)
+        ->withDefault(function ($productImage, $product) {
+            $firstImage = $product->images()->first();
+            if ($firstImage) {
+                $productImage->image_path = $firstImage->image_path;
+            } else {
+                $productImage->image_path = 'images/default-product.png';
+            }
+        });
+}
+
 }
