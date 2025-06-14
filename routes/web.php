@@ -24,6 +24,7 @@ Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth'
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/{product}', [HomeController::class, 'show'])->name('show');
 
 
 Route::middleware('auth','role:seller')->prefix('seller/products')->name('seller.products.')->group(function () {

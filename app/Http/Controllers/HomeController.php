@@ -22,4 +22,9 @@ class HomeController extends Controller
             'featuredProducts' => $featuredProducts
         ]);
     }
+    public function show(Product $product){
+        return view('home.show', [
+            'product' => $product
+        ]);
+    }
 }
