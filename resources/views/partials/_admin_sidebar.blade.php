@@ -31,12 +31,7 @@
               Manage Users
             </a>
         </li>
-        <li>
-            <a href="" class="nav-link {{ request()->routeIs('seller.orders.*') ? 'active' : 'text-white' }}">
-                <i class="bi bi-card-list me-2"></i>
-                Manage Sellers
-            </a>
-        </li>
+       
          <li>
          <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : 'text-white' }}">
     <i class="bi bi-box-seam me-2"></i>

@@ -120,166 +120,121 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @forelse ($users as $user)
-                            <tr class="border-bottom">
-                                <td class="py-3">
-                                    <span class="badge bg-light text-dark fs-6 px-3 py-2">#{{ $user->id }}</span>
-                                </td>
-                                <td class="py-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
-                                            <i class="bi bi-person-fill text-primary fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark">{{ $user->name }}</div>
-                                            <div class="text-muted small">{{ $user->email }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                              @php
-                                                $role = $user->getRoleNames()->first();
-                                            @endphp
+                  <!-- Paste this entire tbody block into your users/index.blade.php file -->
+<tbody>
+    @forelse ($users as $user)
+        <tr class="border-bottom">
+            <td class="py-3">
+                <span class="badge bg-light text-dark fs-6 px-3 py-2">#{{ $user->id }}</span>
+            </td>
+            <td class="py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                        <i class="bi bi-person-fill text-primary fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">{{ $user->name }}</div>
+                        <div class="text-muted small">{{ $user->email }}</div>
+                    </div>
+                </div>
+            </td>
+            @php
+                $role = $user->getRoleNames()->first();
+            @endphp
+            <td class="py-3">
+                @if ($role === 'admin')
+                    <span class="badge bg-danger text-white fs-6 px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge me-1"></i>
+                        {{ ucfirst($role) }}
+                    </span>
+                @elseif ($role === 'seller')
+                    <span class="badge bg-success text-white fs-6 px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge me-1"></i>
+                        {{ ucfirst($role) }}
+                    </span>
+                @elseif ($role === 'buyer')
+                    <span class="badge bg-primary text-white fs-6 px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge me-1"></i>
+                        {{ ucfirst($role) }}
+                    </span>
+                @else
+                    <span class="badge bg-secondary text-white fs-6 px-3 py-2 rounded-pill">
+                        <i class="bi bi-person-badge me-1"></i>
+                        {{ ucfirst($role ?? 'N/A') }}
+                    </span>
+                @endif
+            </td>
+            <td class="py-3">
+                @if ($user->status == 'approved')
+                    <span class="badge bg-success fs-6 px-3 py-2 rounded-pill"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                @elseif ($user->status == 'pending')
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill"><i class="bi bi-clock-history me-1"></i>Pending</span>
+                @elseif ($user->status == 'banned')
+                    <span class="badge bg-dark fs-6 px-3 py-2 rounded-pill"><i class="bi bi-shield-x me-1"></i>Banned</span>
+                @elseif ($user->status == 'rejected')
+                    <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill"><i class="bi bi-x-circle me-1"></i>Rejected</span>
+                @endif
+            </td>
+            <td class="py-3">
+                <div class="text-dark fw-medium">{{ $user->created_at->format('M d, Y') }}</div>
+                <div class="text-muted small">{{ $user->created_at->diffForHumans() }}</div>
+            </td>
+            <td class="py-3 text-center">
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <!-- View Button (Always available) -->
+                    <a href="{{ route('admin.users.show', $user) }}" class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" title="View User Details">
+                        <i class="bi bi-eye"></i>
+                    </a>
 
-                                            <td class="py-3">
-                                                @if ($role === 'admin')
-                                                    <span class="badge bg-danger text-white fs-6 px-3 py-2 rounded-pill">
-                                                        <i class="bi bi-person-badge me-1"></i>
-                                                        {{ ucfirst($role) }}
-                                                    </span>
-                                                @elseif ($role === 'seller')
-                                                    <span class="badge bg-success text-white fs-6 px-3 py-2 rounded-pill">
-                                                        <i class="bi bi-person-badge me-1"></i>
-                                                        {{ ucfirst($role) }}
-                                                    </span>
-                                                @elseif ($role === 'buyer')
-                                                    <span class="badge bg-primary text-white fs-6 px-3 py-2 rounded-pill">
-                                                        <i class="bi bi-person-badge me-1"></i>
-                                                        {{ ucfirst($role) }}
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-secondary text-white fs-6 px-3 py-2 rounded-pill">
-                                                        <i class="bi bi-person-badge me-1"></i>
-                                                        {{ ucfirst($role ?? 'N/A') }}
-                                                    </span>
-                                                @endif
-                                            </td>
+                    {{-- Do not allow actions on other Admins or the logged-in user --}}
+                    @if($user->id !== auth()->id() && !$user->hasRole('admin'))
+                        
+                        <!-- ===================== THIS IS THE UPDATED SECTION ===================== -->
+                        {{-- 1. Seller Approval Logic: Now links to the detail page for action --}}
+                        @if ($user->hasRole('seller') && $user->status == 'pending')
+                            <a href="{{ route('admin.users.show', $user) }}" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" title="Review to Approve/Reject">
+                                <i class="bi bi-clipboard2-check"></i>
+                            </a>
+                        @endif
+                        <!-- =================== END OF THE UPDATED SECTION ==================== -->
+                        
+                        {{-- 2. Banning Logic (Remains unchanged) --}}
+                        @if ($user->status == 'approved')
+                            <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to BAN this user?');">
+                                @csrf @method('PATCH')
+                                <button type="submit" class="btn btn-dark btn-sm" data-bs-toggle="tooltip" title="Ban User">
+                                    <i class="bi bi-shield-x"></i>
+                                </button>
+                            </form>
+                        {{-- 3. Unbanning Logic (Remains unchanged) --}}
+                        @elseif ($user->status == 'banned')
+                            <form action="{{ route('admin.users.unban', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to UNBAN this user?');">
+                                @csrf @method('PATCH')
+                                <button type="submit" class="btn btn-info btn-sm" data-bs-toggle="tooltip" title="Unban User">
+                                    <i class="bi bi-shield-check"></i>
+                                </button>
+                            </form>
+                        @endif
 
-
-                                <td class="py-3">
-                                    @if ($user->status == 'approved')
-                                        <span class="badge bg-success fs-6 px-3 py-2 rounded-pill">
-                                            <i class="bi bi-check-circle me-1"></i>Approved
-                                        </span>
-                                    @elseif ($user->status == 'pending')
-                                        <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">
-                                            <i class="bi bi-clock-history me-1"></i>Pending
-                                        </span>
-                                    @elseif ($user->status == 'banned')
-                                        <span class="badge bg-dark fs-6 px-3 py-2 rounded-pill">
-                                            <i class="bi bi-shield-x me-1"></i>Banned
-                                        </span>
-                                    @elseif ($user->status == 'rejected')
-                                        <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill">
-                                            <i class="bi bi-x-circle me-1"></i>Rejected
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="py-3">
-                                    <div class="text-dark fw-medium">{{ $user->created_at->format('M d, Y') }}</div>
-                                    <div class="text-muted small">{{ $user->created_at->diffForHumans() }}</div>
-                                </td>
-                                <td class="py-3 text-center">
-                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
-                                        <!-- View Button -->
-                                        <a href="{{ route('admin.users.show', $user) }}" 
-                                           class="btn btn-outline-primary btn-sm" 
-                                           data-bs-toggle="tooltip" 
-                                           title="View User Details">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-
-                                        {{-- Do not allow actions on other Admins or the logged-in user --}}
-                                        @if($user->id !== auth()->id() && !$user->hasRole('admin'))
-                                            {{-- 1. Seller Approval Logic --}}
-                                            @if ($user->hasRole('seller') && $user->status == 'pending')
-                                                <form action="{{ route('admin.sellers.approve', $user->id) }}" 
-                                                      method="POST" 
-                                                      class="d-inline" 
-                                                      onsubmit="return confirm('Are you sure you want to approve this seller?');">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit" 
-                                                            class="btn btn-success btn-sm" 
-                                                            data-bs-toggle="tooltip" 
-                                                            title="Approve Seller">
-                                                        <i class="bi bi-check-circle"></i>
-                                                    </button>
-                                                </form>
-                                                <form action="{{ route('admin.sellers.reject', $user->id) }}" 
-                                                      method="POST" 
-                                                      class="d-inline" 
-                                                      onsubmit="return confirm('Are you sure you want to REJECT this seller?');">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit" 
-                                                            class="btn btn-danger btn-sm" 
-                                                            data-bs-toggle="tooltip" 
-                                                            title="Reject Seller">
-                                                        <i class="bi bi-x-circle"></i>
-                                                    </button>
-                                                </form>
-                                            {{-- 2. Banning Logic --}}
-                                            @elseif ($user->status == 'approved')
-                                                <form action="{{ route('admin.users.ban', $user->id) }}" 
-                                                      method="POST" 
-                                                      class="d-inline" 
-                                                      onsubmit="return confirm('Are you sure you want to BAN this user? They will not be able to log in.');">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit" 
-                                                            class="btn btn-dark btn-sm" 
-                                                            data-bs-toggle="tooltip" 
-                                                            title="Ban User">
-                                                        <i class="bi bi-shield-x"></i>
-                                                    </button>
-                                                </form>
-                                            {{-- 3. Unbanning Logic --}}
-                                            @elseif ($user->status == 'banned')
-                                                <form action="{{ route('admin.users.unban', $user->id) }}" 
-                                                      method="POST" 
-                                                      class="d-inline" 
-                                                      onsubmit="return confirm('Are you sure you want to UNBAN this user? They will regain access.');">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit" 
-                                                            class="btn btn-info btn-sm" 
-                                                            data-bs-toggle="tooltip" 
-                                                            title="Unban User">
-                                                        <i class="bi bi-shield-check"></i>
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <span class="badge bg-light text-muted">—</span>
-                                            @endif
-                                        @else
-                                            {{-- Show this for the logged-in user or other admins --}}
-                                      
-
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="d-flex flex-column align-items-center">
-                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                            <i class="bi bi-people text-muted fs-1"></i>
-                                        </div>
-                                        <h5 class="text-muted mb-2">No Users Found</h5>
-                                        <p class="text-muted mb-0">No users match the current filter criteria.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+                    @endif
+                </div>
+            </td>
+        </tr>
+    @empty
+        <!-- The empty state remains the same -->
+        <tr>
+            <td colspan="6" class="text-center py-5">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-people text-muted fs-1"></i>
+                    </div>
+                    <h5 class="text-muted mb-2">No Users Found</h5>
+                    <p class="text-muted mb-0">No users match the current filter criteria.</p>
+                </div>
+            </td>
+        </tr>
+    @endforelse
+</tbody>
                 </table>
             </div>
         </div>
