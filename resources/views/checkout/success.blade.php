@@ -21,7 +21,7 @@
                         <a href="{{ route('home') }}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left"></i> Continue Shopping
                         </a>
-                        <a href="" class="btn btn-primary">
+                        <a href="{{ route('users.orders.show', $order) }}" class="btn btn-primary">
                             <i class="bi bi-receipt"></i> View My Orders
                         </a>
                     </div>

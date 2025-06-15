@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Traits\HasRoles;
 use App\Models\User;
 
 class SessionController extends Controller
@@ -14,42 +15,47 @@ class SessionController extends Controller
     return view('auth.login');
    }
 
-   public function store(Request $request){
+  public function store(Request $request)
+{
+    $credentials = $request->validate([
+        'email'    => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        $credentials = $request->validate([
-            'email'    => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+    $user = User::where('email', $credentials['email'])->first();
 
-        // Attempt to find the user first
-        $user = User::where('email', $credentials['email'])->first();
-
-        if ($user) {
-            // Check if user is rejected
-            if ($user->isRejected()) {
-                throw ValidationException::withMessages([
-                    'email' => 'Your account has been rejected. Please contact support.',
-                ]);
-            }
-
-            // Check if user needs approval (instructor with pending status)
-            if ($user->needsApproval()) {
-                throw ValidationException::withMessages([
-                    'email' => 'Your account is pending approval. Please wait for admin approval.',
-                ]);
-            }
+    if ($user) {
+        if ($user->isRejected()) {
+            throw ValidationException::withMessages([
+                'email' => 'Your account has been rejected. Please contact support.',
+            ]);
         }
 
-        // Attempt authentication
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate(); // Prevent session fixation
-            return redirect()->intended('/')->with('message', 'Logged in successfully!');
+        if ($user->needsApproval()) {
+            throw ValidationException::withMessages([
+                'email' => 'Your account is pending approval. Please wait for admin approval.',
+            ]);
         }
+    }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials. Email or password does not match our records.',
-        ])->onlyInput('email');
-   }
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->hasRole('seller')) {
+            return redirect()->route('seller.products.index');
+        } else {
+            return redirect('/'); // for buyer or others
+        }
+    }
+
+    return back()->withErrors([
+        'email' => 'Invalid credentials. Email or password does not match our records.',
+    ])->onlyInput('email');
+}
+
 
    public function destroy(){
      Auth::logout();

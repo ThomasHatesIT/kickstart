@@ -63,7 +63,9 @@
                     <a class="nav-link position-relative" href="{{ route('cart.index') }}">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6em;">
-                            3 {{-- This should be dynamic cart count --}}
+                     {{ Auth::check() ? Auth::user()->cartItems->count() : 0 }}
+
+
                         </span>
                         Cart
                     </a>
