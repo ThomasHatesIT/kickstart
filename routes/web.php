@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SellerProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\User\OrderController;
+use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -59,14 +60,24 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Seller routes (auth & role required)
-Route::middleware(['auth', 'role:seller'])->prefix('seller/products')->name('seller.products.')->group(function () {
-    Route::get('/', [SellerProductController::class, 'index'])->name('index');
-    Route::get('/create', [SellerProductController::class, 'create'])->name('create');
-    Route::post('/', [SellerProductController::class, 'store'])->name('store'); 
-    Route::get('/{product}/edit', [SellerProductController::class, 'edit'])->name('edit');
-    Route::put('/{product}', [SellerProductController::class, 'update'])->name('update');
-    Route::delete('/{product}', [SellerProductController::class, 'destroy'])->name('destroy');
-});
+Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
+    
+    // Existing product routes
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', [SellerProductController::class, 'index'])->name('index');
+        Route::get('/create', [SellerProductController::class, 'create'])->name('create');
+        Route::post('/', [SellerProductController::class, 'store'])->name('store'); 
+        Route::get('/{product}/edit', [SellerProductController::class, 'edit'])->name('edit');
+        Route::put('/{product}', [SellerProductController::class, 'update'])->name('update');
+        Route::delete('/{product}', [SellerProductController::class, 'destroy'])->name('destroy');
+    });
+
+    // NEW Seller Order Management Routes
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [SellerOrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [SellerOrderController::class, 'show'])->name('show');
+        Route::patch('/{order}', [SellerOrderController::class, 'updateStatus'])->name('update');
+    });
 
 // Admin routes (auth & role required)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -85,7 +96,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/products/{product}/approve', [AdminProductController::class, 'approve'])->name('products.approve');
     Route::patch('/products/{product}/reject', [AdminProductController::class, 'reject'])->name('products.reject');
 });
-
+});
 
 // ========================================================================
 // 3. CATCH-ALL DYNAMIC ROUTES LAST

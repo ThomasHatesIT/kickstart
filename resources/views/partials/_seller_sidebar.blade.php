@@ -31,7 +31,7 @@
             </a>
         </li>
         <li>
-            <a href="" class="nav-link {{ request()->routeIs('seller.orders.*') ? 'active' : 'text-white' }}">
+            <a href="{{ route('seller.orders.index') }}" class="nav-link {{ request()->routeIs('seller.orders.*') ? 'active' : 'text-white' }}">
                 <i class="bi bi-card-list me-2"></i>
                 My Orders
             </a>

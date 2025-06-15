@@ -12,11 +12,8 @@ class CartController extends Controller
     /**
      * Display the user's shopping cart.
      */
-  // In app/Http/Controllers/CartController.php
-
- public function index()
+    public function index()
     {
-       
         $cartItems = Auth::user()->cartItems()->with('product.primaryImageModel')->get();
 
         $total = $cartItems->sum(function ($item) {
@@ -25,7 +22,6 @@ class CartController extends Controller
 
         return view('cart.index', compact('cartItems', 'total'));
     }
-
 
     /**
      * Add a product to the cart.
@@ -55,7 +51,7 @@ class CartController extends Controller
             // Update quantity if item already exists
             $newQuantity = $existingCartItem->quantity + $request->quantity;
             if ($product->stock < $newQuantity) {
-                 return back()->with('error', 'Cannot add more. Not enough stock available.');
+                return back()->with('error', 'Cannot add more. Not enough stock available.');
             }
             $existingCartItem->increment('quantity', $request->quantity);
         } else {
@@ -67,12 +63,12 @@ class CartController extends Controller
             ]);
         }
 
-     // CORRECT VERSION
-return redirect()->route('cart.index')->with('success', 'Product added to cart successfully!');
+        return redirect()->route('c.index')->with('success', 'Product added to cart successfully!');
     }
 
     /**
      * Update the quantity of a cart item.
+     * Enhanced to handle auto-updates smoothly
      */
     public function update(Request $request, CartItem $cartItem)
     {
@@ -81,16 +77,44 @@ return redirect()->route('cart.index')->with('success', 'Product added to cart s
             abort(403, 'Unauthorized action.');
         }
 
-        $request->validate(['quantity' => 'required|integer|min:1']);
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
 
-        // Check for stock
-        if ($cartItem->product->stock < $request->quantity) {
-            return back()->with('error', 'Not enough stock available.');
+        $newQuantity = $request->quantity;
+        $product = $cartItem->product;
+
+        // Check for stock availability
+        if ($product->stock < $newQuantity) {
+            return back()->with('error', "Only {$product->stock} items available in stock.");
         }
-        
-        $cartItem->update(['quantity' => $request->quantity]);
 
-        return back()->with('success', 'Cart updated successfully.');
+        // Update the cart item
+        $cartItem->update(['quantity' => $newQuantity]);
+
+        // Calculate new totals for smooth UI updates
+        $itemTotal = $cartItem->quantity * $product->price;
+        $cartTotal = Auth::user()->cartItems()->with('product')->get()->sum(function ($item) {
+            return $item->quantity * $item->product->price;
+        });
+
+        // Return appropriate response based on request type
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart updated successfully!',
+                'item_total' => number_format($itemTotal, 2),
+                'cart_total' => number_format($cartTotal, 2),
+                'quantity' => $cartItem->quantity
+            ]);
+        }
+
+        // For regular form submissions (our case)
+        $message = $newQuantity === 1 ? 
+            'Cart updated successfully!' : 
+            "Quantity updated to {$newQuantity} items.";
+            
+        return back()->with('success', $message);
     }
 
     /**
@@ -103,8 +127,21 @@ return redirect()->route('cart.index')->with('success', 'Product added to cart s
             abort(403, 'Unauthorized action.');
         }
 
+        $productName = $cartItem->product->name;
         $cartItem->delete();
 
-        return back()->with('success', 'Product removed from cart.');
+        return back()->with('success', "'{$productName}' removed from cart.");
+    }
+
+    /**
+     * Get cart count for navbar badge (optional helper method)
+     */
+    public function getCartCount()
+    {
+        if (!Auth::check()) {
+            return 0;
+        }
+
+        return Auth::user()->cartItems()->sum('quantity');
     }
 }
