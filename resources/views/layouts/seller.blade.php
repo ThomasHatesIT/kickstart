@@ -31,20 +31,30 @@
         {{-- This will also stretch to the full height --}}
         <main class="flex-grow-1 p-4" style="background-color: #f8f9fa;">
                     {{-- Success Alert --}}
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+       {{-- ====================================================== --}}
+        {{-- START: Add this Alert Box Section                     --}}
+        {{-- ====================================================== --}}
+        <div class="row">
+            <div class="col-12">
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
 
-        {{-- Error Alert --}}
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
+        {{-- ====================================================== --}}
+        {{-- END: Alert Box Section                                --}}
+        {{-- ====================================================== --}}
+
 
             @yield('content')
         </main>

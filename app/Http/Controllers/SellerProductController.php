@@ -11,10 +11,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule; // <-- Import the Rule class for better validation
+use Illuminate\Validation\Rule;
 
 class SellerProductController extends Controller
 {
+    // ... (index, create, store, edit methods remain the same) ...
+    // The previous code for index, create, store, and edit is correct and can be left as is.
+
     /**
      * Define a single source of truth for available product sizes.
      * This avoids repeating the array in multiple methods.
@@ -124,8 +127,10 @@ class SellerProductController extends Controller
         ]);
     }
 
+
     /**
      * Update the specified product in storage.
+     * --- MODIFIED LOGIC ---
      */
     public function update(Request $request, Product $product)
     {
@@ -144,16 +149,22 @@ class SellerProductController extends Controller
             'color' => 'nullable|string|max:50',
             'primary_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'sizes' => 'nullable|array',
-            'sizes.*' => ['string', Rule::in($this->availableSizes)], // Also validate sizes on update
+            'sizes.*' => ['string', Rule::in($this->availableSizes)],
+            // NEW: Validate the new checkbox input
+            'remove_primary_image' => 'nullable|boolean',
         ]);
+
+        $imageChanged = false; // Flag to track if the image was changed or removed
 
         try {
             DB::beginTransaction();
 
-            // Handle new image upload (if provided)
+            $oldPrimaryImage = $product->images->firstWhere('is_primary', true);
+
+            // Case 1: A new primary image is uploaded
             if ($request->hasFile('primary_image')) {
-                // Delete the old primary image first
-                $oldPrimaryImage = $product->images->firstWhere('is_primary', true);
+                $imageChanged = true;
+                // Delete the old primary image if it exists
                 if ($oldPrimaryImage) {
                     Storage::disk('public')->delete($oldPrimaryImage->image_path);
                     $oldPrimaryImage->delete();
@@ -162,9 +173,15 @@ class SellerProductController extends Controller
                 $imagePath = $request->file('primary_image')->store('products', 'public');
                 $product->images()->create(['image_path' => $imagePath, 'is_primary' => true]);
             }
+            // Case 2: The 'remove image' checkbox is checked (and there is no new image)
+            elseif ($request->input('remove_primary_image') && $oldPrimaryImage) {
+                 $imageChanged = true;
+                 Storage::disk('public')->delete($oldPrimaryImage->image_path);
+                 $oldPrimaryImage->delete();
+            }
 
-            // Update the product's details
-            $product->update([
+            // Prepare data for the update
+            $updateData = [
                 'name' => $validated['name'],
                 'description' => $validated['description'],
                 'price' => $validated['price'],
@@ -172,9 +189,16 @@ class SellerProductController extends Controller
                 'category_id' => $validated['category_id'],
                 'brand' => $validated['brand'],
                 'color' => $validated['color'],
-                // Use ?? [] to ensure an empty array is saved if no sizes are checked
                 'sizes' => $validated['sizes'] ?? [],
-            ]);
+            ];
+
+            // NEW: If the image was changed, set the status to 'pending'
+            if ($imageChanged) {
+                $updateData['status'] = 'pending';
+            }
+
+            // Update the product's details
+            $product->update($updateData);
 
             DB::commit();
 
@@ -184,8 +208,13 @@ class SellerProductController extends Controller
             return back()->with('error', 'There was a problem updating the product.')->withInput();
         }
 
+        // NEW: Provide a conditional success message
+        $successMessage = $imageChanged
+            ? 'Product updated successfully! Because the image was changed, it is now pending admin approval.'
+            : 'Product updated successfully!';
+
         return redirect()->route('seller.products.index')
-                         ->with('success', 'Product updated successfully!');
+                         ->with('success', $successMessage);
     }
 
     /**

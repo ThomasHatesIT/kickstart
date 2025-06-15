@@ -4,18 +4,21 @@
 
 @section('content')
 
-    {{-- NEW: Clean header row for the page --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h1 mb-0">Edit Product</h2>
-       
     </div>
 
     <div class="card shadow-sm">
         <div class="card-header">
-            {{-- A more specific title for the card itself --}}
             <h4 class="mb-0">Editing: <span class="text-muted">{{ $product->name }}</span></h4>
         </div>
         <div class="card-body">
+            {{-- NEW: Warning message, initially hidden --}}
+            <div id="image-change-warning" class="alert alert-warning" role="alert" style="display: none;">
+                <h4 class="alert-heading">Heads up!</h4>
+                <p>Changing or removing the product's primary image will reset its status to <strong>Pending Approval</strong>. The product will be hidden from the public store until an admin re-approves it.</p>
+            </div>
+
             <form action="{{ route('seller.products.update', $product) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -81,33 +84,31 @@
                         @enderror
                     </div>
 
-                         <div class="col-12">
-    <label class="form-label">Available Sizes</label>
-    <div class="d-flex flex-wrap gap-2 border p-2 rounded @error('sizes') is-invalid @enderror">
-        @foreach ($sizes as $size)
-            <div class="form-check">
-                <input class="form-check-input"
-                       type="checkbox"
-                       name="sizes[]"
-                       value="{{ $size }}"
-                       id="size_{{ str_replace('.', '_', $size) }}"
-                       
-                       {{-- THIS IS THE KEY LOGIC FOR AN EDIT FORM --}}
-                       {{ in_array($size, old('sizes', $product->sizes ?? [])) ? 'checked' : '' }}>
-                
-                <label class="form-check-label" for="size_{{ str_replace('.', '_', $size) }}">
-                    {{ $size }}
-                </label>
-            </div>
-        @endforeach
-    </div>
-    @error('sizes')
-        <div class="invalid-feedback d-block">{{ $message }}</div>
-    @enderror
-    @error('sizes.*') {{-- For individual invalid size errors --}}
-        <div class="invalid-feedback d-block">{{ $message }}</div>
-    @enderror
-</div>
+                    <div class="col-12">
+                        <label class="form-label">Available Sizes</label>
+                        <div class="d-flex flex-wrap gap-2 border p-2 rounded @error('sizes') is-invalid @enderror">
+                            @foreach ($sizes as $size)
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        name="sizes[]"
+                                        value="{{ $size }}"
+                                        id="size_{{ str_replace('.', '_', $size) }}"
+                                        {{ in_array($size, old('sizes', $product->sizes ?? [])) ? 'checked' : '' }}>
+                                    
+                                    <label class="form-check-label" for="size_{{ str_replace('.', '_', $size) }}">
+                                        {{ $size }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                        @error('sizes')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                        @error('sizes.*')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <!-- Description -->
                     <div class="col-12">
@@ -127,9 +128,12 @@
                             @endphp
                             @if($primaryImage)
                                 <img src="{{ Storage::url($primaryImage->image_path) }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                {{-- NEW: Checkbox to remove the image --}}
                                 <div class="form-check text-danger mt-2">
-                                    <input class="form-check-input" type="checkbox" name="remove_primary_image" id="remove_primary_image" value="1">
-                                    <label class="form-check-label" for="remove_primary_image"><strong>Remove this image</strong></label>
+                                    <input class="form-check-input" type="checkbox" name="remove_primary_image" id="remove_primary_image" value="1" {{ old('remove_primary_image') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="remove_primary_image">
+                                        <strong>Remove this image and set product for re-approval</strong>
+                                    </label>
                                 </div>
                             @else
                                 <span class="text-muted">No primary image uploaded.</span>
@@ -140,7 +144,6 @@
                     <!-- Upload New Image -->
                     <div class="col-12">
                         <label for="primary_image" class="form-label">Upload New Primary Image (Optional)</label>
-                        {{-- FIX: Corrected the typo from 'primary_imge' to 'primary_image' --}}
                         <input type="file" name="primary_image" id="primary_image" class="form-control @error('primary_image') is-invalid @enderror">
                         <div class="form-text">Leave blank to keep the current image. PNG, JPG, WEBP up to 2MB.</div>
                         @error('primary_image')
@@ -149,17 +152,43 @@
                     </div>
                 </div>
 
-                {{-- MOVED: The update button is now here at the end of the form --}}
                 <div class="mt-4 text-end">
                      <a href="{{ route('seller.products.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Back to Products
-        </a>
+                        <i class="bi bi-arrow-left me-1"></i> Back to Products
+                     </a>
                     <button type="submit" class="btn btn-primary px-4">
                         Update Product
                     </button>
-                    
                 </div>
             </form>
         </div>
     </div>
 @endsection
+
+{{-- NEW: Add a script section for dynamic warning --}}
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const primaryImageInput = document.getElementById('primary_image');
+    const removeImageCheckbox = document.getElementById('remove_primary_image');
+    const warningAlert = document.getElementById('image-change-warning');
+
+    function toggleWarning() {
+        // Show warning if a new file is selected OR if the remove checkbox is checked
+        if ((primaryImageInput && primaryImageInput.files.length > 0) || (removeImageCheckbox && removeImageCheckbox.checked)) {
+            warningAlert.style.display = 'block';
+        } else {
+            warningAlert.style.display = 'none';
+        }
+    }
+
+    // Add event listeners to both inputs
+    if (primaryImageInput) {
+        primaryImageInput.addEventListener('change', toggleWarning);
+    }
+    if (removeImageCheckbox) {
+        removeImageCheckbox.addEventListener('change', toggleWarning);
+    }
+});
+</script>
+@endpush
