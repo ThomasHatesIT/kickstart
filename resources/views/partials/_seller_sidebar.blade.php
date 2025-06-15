@@ -19,7 +19,7 @@
                 - If the route matches, the class is 'active'.
                 - If not, we explicitly set 'text-white' because the default nav-link is blue.
             --}}
-            <a href="" class="nav-link {{ request()->routeIs('seller.dashboard') ? 'active' : 'text-white' }}">
+            <a href="{{ route('seller.dashboard')}}" class="nav-link {{ request()->routeIs('seller.dashboard') ? 'active' : 'text-white' }}">
                 <i class="bi bi-speedometer2 me-2"></i>
                 Dashboard
             </a>
@@ -37,7 +37,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('seller.sales.history')}}" class="nav-link text-white">
                 <i class="bi bi-bar-chart-line me-2"></i>
                 Sales History
             </a>

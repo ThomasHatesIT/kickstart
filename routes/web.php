@@ -1,106 +1,139 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+// General & Authentication Controllers
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RegisterUserController;
 use App\Http\Controllers\SessionController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\SellerProductController;
+
+// Main Feature Controllers
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\User\OrderController;
-use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\CheckoutController;
+
+// User-Specific Controllers (Aliased)
+use App\Http\Controllers\User\OrderController as UserOrderController;
+
+// Seller-Specific Controllers (Aliased)
+use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
+use App\Http\Controllers\Seller\OrderController as SellerOrderController;
+use App\Http\Controllers\Seller\ProductController as SellerProductController;
+
+// Admin-Specific Controllers (Aliased)
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProductController;
+
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
+|
+| The routes are ordered by specificity:
+| 1. Static public routes.
+| 2. Grouped, prefixed routes (user, seller, admin).
+| 3. Dynamic "catch-all" routes at the very end.
+|
 */
 
 
 // ========================================================================
-// 1. ALL STATIC AND SPECIFIC ROUTES FIRST
+// 1. PUBLIC & AUTHENTICATION ROUTES
 // ========================================================================
 
-// Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Authentication routes
-Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
-Route::post('/register', [RegisterUserController::class, 'store']);
-Route::get('/login', [SessionController::class, 'index'])->name('login');
-Route::post('/login', [SessionController::class, 'store']);
+// Auth routes for guests
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
+    Route::post('/register', [RegisterUserController::class, 'store']);
+    Route::get('/login', [SessionController::class, 'index'])->name('login');
+    Route::post('/login', [SessionController::class, 'store']);
+});
+
+// Logout requires authentication
 Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
 
 
 // ========================================================================
-// 2. ALL GROUPED AND PREFIXED ROUTES
+// 2. LOGGED-IN USER & CART ROUTES
 // ========================================================================
 
-// Cart routes (auth required)
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
+    // Cart Routes
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
 
-
-     // Checkout Routes
+    // Checkout Routes
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
-
-
-     // User Order Routes
-    Route::get('/orders', [OrderController::class, 'index'])->name('users.orders.index');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('users.orders.show');
-    Route::get('/orders/{order}/download', [OrderController::class, 'downloadInvoice'])->name('users.orders.download');
 });
 
-// Seller routes (auth & role required)
+
+// ========================================================================
+// 3. ROLE-SPECIFIC GROUPED ROUTES
+// ========================================================================
+
+// Logged-in Buyer/User Specific Routes
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    // This route group now uses the aliased UserOrderController
+    Route::get('/orders', [UserOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [UserOrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/download', [UserOrderController::class, 'downloadInvoice'])->name('orders.download');
+    // You can add profile, favorites, etc. routes here later
+});
+
+// Seller Routes (requires seller role)
 Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->group(function () {
     
-    // Existing product routes
+    Route::get('/dashboard', [SellerDashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/sales-history', [SellerDashboardController::class, 'salesHistory'])->name('sales.history');
+    
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [SellerProductController::class, 'index'])->name('index');
         Route::get('/create', [SellerProductController::class, 'create'])->name('create');
-        Route::post('/', [SellerProductController::class, 'store'])->name('store'); 
+        Route::post('/', [SellerProductController::class, 'store'])->name('store');
         Route::get('/{product}/edit', [SellerProductController::class, 'edit'])->name('edit');
         Route::put('/{product}', [SellerProductController::class, 'update'])->name('update');
         Route::delete('/{product}', [SellerProductController::class, 'destroy'])->name('destroy');
     });
 
-    // NEW Seller Order Management Routes
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [SellerOrderController::class, 'index'])->name('index');
         Route::get('/{order}', [SellerOrderController::class, 'show'])->name('show');
         Route::patch('/{order}', [SellerOrderController::class, 'updateStatus'])->name('update');
     });
+});
 
-// Admin routes (auth & role required)
+// Admin Routes (requires admin role)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-    // User Management
+    
+    // Admin User Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
     Route::patch('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
     Route::patch('/users/{user}/unban', [AdminUserController::class, 'unban'])->name('users.unban');
-    // Seller Status
+    
+    // Admin Seller Approval
     Route::patch('/sellers/{user}/approve', [AdminUserController::class, 'approveSeller'])->name('sellers.approve');
     Route::patch('/sellers/{user}/reject', [AdminUserController::class, 'rejectSeller'])->name('sellers.reject');
-    // Product Management
+
+    // Admin Product Management
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('products.show');
     Route::patch('/products/{product}/approve', [AdminProductController::class, 'approve'])->name('products.approve');
     Route::patch('/products/{product}/reject', [AdminProductController::class, 'reject'])->name('products.reject');
 });
-});
+
 
 // ========================================================================
-// 3. CATCH-ALL DYNAMIC ROUTES LAST
+// 4. CATCH-ALL DYNAMIC ROUTE (MUST BE LAST)
 // ========================================================================
 
-// This must be one of the LAST public routes defined.
+// This route handles product detail pages, e.g., /air-jordan-1
 Route::get('/{product}', [HomeController::class, 'show'])->name('show');
