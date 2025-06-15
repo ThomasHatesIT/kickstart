@@ -63,7 +63,7 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->route('c.index')->with('success', 'Product added to cart successfully!');
+        return redirect()->route('cart.index')->with('success', 'Product added to cart successfully!');
     }
 
     /**

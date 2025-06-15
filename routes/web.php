@@ -15,14 +15,15 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\User\OrderController as UserOrderController;
 
 // Seller-Specific Controllers (Aliased)
-use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
-use App\Http\Controllers\Seller\OrderController as SellerOrderController;
-use App\Http\Controllers\Seller\ProductController as SellerProductController;
+use App\Http\Controllers\Seller\SellerDashboardController as SellerDashboardController;
+use App\Http\Controllers\Seller\SellerOrderController as SellerOrderController;
+use App\Http\Controllers\SellerProductController as SellerProductController;
 
 // Admin-Specific Controllers (Aliased)
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminOrderController;
 
 
 /*
@@ -79,7 +80,7 @@ Route::middleware('auth')->group(function () {
 // ========================================================================
 
 // Logged-in Buyer/User Specific Routes
-Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+Route::middleware(['auth'])->prefix('user')->name('users.')->group(function () {
     // This route group now uses the aliased UserOrderController
     Route::get('/orders', [UserOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [UserOrderController::class, 'show'])->name('orders.show');
@@ -92,7 +93,8 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     
     Route::get('/dashboard', [SellerDashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/sales-history', [SellerDashboardController::class, 'salesHistory'])->name('sales.history');
-    
+
+
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [SellerProductController::class, 'index'])->name('index');
         Route::get('/create', [SellerProductController::class, 'create'])->name('create');
@@ -106,14 +108,34 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
         Route::get('/', [SellerOrderController::class, 'index'])->name('index');
         Route::get('/{order}', [SellerOrderController::class, 'show'])->name('show');
         Route::patch('/{order}', [SellerOrderController::class, 'updateStatus'])->name('update');
+           Route::get('/{order}/packing-slip', [SellerOrderController::class, 'downloadPackingSlip'])->name('packing-slip');
+    
     });
+
+
+
+
 });
 
 // Admin Routes (requires admin role)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-    
+        // NEW Order Management Routes
+
+
+
+
+
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::patch('/orders/{order}', [AdminOrderController::class, 'updateStatus'])->name('orders.update');
+
+
     // Admin User Management
+
+
+
+
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
     Route::patch('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');

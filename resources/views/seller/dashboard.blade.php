@@ -17,7 +17,7 @@
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-2 text-uppercase font-weight-bold text-muted">Total Revenue</p>
-                                <h4 class="font-weight-bolder text-dark mb-2">€{{ number_format($totalRevenue, 2) }}</h4>
+                                <h4 class="font-weight-bolder text-dark mb-2">₱{{ number_format($totalRevenue, 2) }}</h4>
                                 <p class="mb-0">
                                     <span class="text-success text-sm font-weight-bolder">
                                         <i class="bi bi-arrow-up me-1"></i>{{ $productsSoldCount }}
@@ -162,7 +162,7 @@
                                 </div>
                                 <div class="text-end">
                                     <span class="text-primary text-sm font-weight-bold">
-                                        €{{ number_format($order->total_amount, 2) }}
+                                        ₱{{ number_format($order->total_amount, 2) }}
                                     </span>
                                     <br>
                                     <span class="badge bg-success text-white text-xs mt-1">Completed</span>

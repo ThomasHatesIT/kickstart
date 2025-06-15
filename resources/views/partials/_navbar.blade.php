@@ -25,23 +25,8 @@
                         <i class="fas fa-th-large me-1"></i>Products
                     </a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-list me-1"></i>Categories
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-running me-2"></i>Athletic Shoes</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-tie me-2"></i>Dress Shoes</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-hiking me-2"></i>Casual Shoes</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View All</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-info-circle me-1"></i>About
-                    </a>
-                </li>
+              
+              
             </ul>
 
             <!-- Right Side Links -->
@@ -57,7 +42,7 @@
                         </div>
                     </form>
                 </li>
-
+                    @auth
                 <!-- Cart -->
                 <li class="nav-item">
                     <a class="nav-link position-relative" href="{{ route('cart.index') }}">
@@ -70,6 +55,7 @@
                         Cart
                     </a>
                 </li>
+                @endauth
 
                 @guest
                     <!-- Login/Register for guests -->

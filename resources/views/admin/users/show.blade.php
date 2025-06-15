@@ -10,9 +10,9 @@
             <h1 class="h2 mb-2 text-gray-800 fw-bold">User Details</h1>
             <p class="mb-0 text-muted fs-6">Review and manage account information and status.</p>
         </div>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-lg rounded-pill px-4">
+        <a href="{{ url()->previous() }}" class="btn btn-outline-primary btn-lg rounded-pill px-4">
             <i class="bi bi-arrow-left me-2"></i>
-            Back to User List
+            Back 
         </a>
     </div>
 

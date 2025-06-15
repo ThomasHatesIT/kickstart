@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SellerOrderController extends Controller
 {
@@ -92,4 +93,28 @@ class SellerOrderController extends Controller
 
         return redirect()->route('seller.orders.show', $order)->with('success', 'Order status has been updated successfully.');
     }
+    public function downloadPackingSlip(Order $order)
+{
+    // Authorize: Ensure the order contains items from this seller.
+    $sellerId = Auth::id();
+    if (!$order->items()->whereHas('product', fn($q) => $q->where('seller_id', $sellerId))->exists()) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Eager load only the seller's items for this order.
+    $order->load(['user', 'items' => function ($query) use ($sellerId) {
+        $query->whereHas('product', function ($subQuery) use ($sellerId) {
+            $subQuery->where('seller_id', $sellerId);
+        })->with('product');
+    }]);
+
+    // Pass the filtered order data to the PDF view
+    $pdf = PDF::loadView('pdf.packing_slip', compact('order'));
+
+    // Generate a filename for the download
+    $filename = 'packing-slip-' . $order->order_number . '.pdf';
+
+    // Stream the PDF to the browser
+    return $pdf->stream($filename);
+}
 }
