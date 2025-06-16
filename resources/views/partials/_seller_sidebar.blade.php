@@ -37,7 +37,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('seller.sales.history')}}" class="nav-link text-white">
+            <a href="{{ route('seller.sales.history')}}" class="nav-link text-white {{ request()->routeIs('seller.sales.*') ? 'active' : 'text-white' }}">
                 <i class="bi bi-bar-chart-line me-2"></i>
                 Sales History
             </a>

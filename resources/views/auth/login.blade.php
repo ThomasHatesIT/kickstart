@@ -8,6 +8,7 @@
 
         <div class="bg-white p-5 rounded shadow">
             <div class="row g-3">
+                <h1>LOGIN</h1>
 
                 <!-- Email -->
                 <x-form-field>

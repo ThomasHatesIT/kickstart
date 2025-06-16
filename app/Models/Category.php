@@ -19,18 +19,12 @@ class Category extends Model
         'description',
     ];
 
-    /**
-     * A Category can have many Products.
-     * This is the most important part of the model.
-     */
+  
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
-    
-    /**
-     * Use the 'slug' for route model binding instead of 'id'.
-     */
+ 
     public function getRouteKeyName()
     {
         return 'slug';

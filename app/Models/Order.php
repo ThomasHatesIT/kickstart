@@ -42,17 +42,13 @@ class Order extends Model
         'delivered_at'   => 'datetime',
     ];
 
-    /**
-     * Get the user (buyer) that placed the order.
-     */
+ 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get all of the items for the order.
-     */
+   
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);

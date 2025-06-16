@@ -63,12 +63,12 @@
                                     {{ $item->product->name }} ({{ $item->size }})
                                     <small class="d-block text-muted">Quantity: {{ $item->quantity }}</small>
                                 </div>
-                                <span>€{{ number_format($item->product->price * $item->quantity, 2) }}</span>
+                                <span>₱{{ number_format($item->product->price * $item->quantity, 2) }}</span>
                             </li>
                             @endforeach
                             <li class="list-group-item d-flex justify-content-between align-items-center fw-bold fs-5">
                                 <span>Total</span>
-                                <span>€{{ number_format($total, 2) }}</span>
+                                <span>₱{{ number_format($total, 2) }}</span>
                             </li>
                         </ul>
                     </div>

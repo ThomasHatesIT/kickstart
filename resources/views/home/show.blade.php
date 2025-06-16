@@ -150,7 +150,7 @@
 
                 {{-- Price --}}
                 <div class="mb-4">
-                    <span class="display-4 fw-bold text-success">${{ number_format($product->price, 2) }}</span>
+                    <span class="display-4 fw-bold text-success">₱{{ number_format($product->price, 2) }}</span>
                 </div>
 
                 {{-- Short description --}}
