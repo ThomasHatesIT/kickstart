@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Users table (roles managed by Spatie)
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');

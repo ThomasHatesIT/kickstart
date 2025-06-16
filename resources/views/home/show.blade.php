@@ -106,7 +106,7 @@
                     <span>Sold By</span>
                 </div>
                 <div class="spec-value fw-semibold text-dark">
-                    {{ $product->seller->name ?? 'N/A' }}
+                    {{ $product->seller->name ?? 'N/A' }} ({{ $product->seller->email }})
                 </div>
             </div>
 
@@ -545,5 +545,32 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+   
+    const quantityInput = document.getElementById('quantity');
+    const minusBtn = document.getElementById('quantity-minus');
+    const plusBtn = document.getElementById('quantity-plus');
+
+    if (quantityInput && minusBtn && plusBtn) {
+        minusBtn.addEventListener('click', function() {
+            let currentValue = parseInt(quantityInput.value);
+            // Ensure value doesn't go below the minimum allowed
+            if (currentValue > parseInt(quantityInput.min)) {
+                quantityInput.value = currentValue - 1;
+            }
+        });
+
+        plusBtn.addEventListener('click', function() {
+            let currentValue = parseInt(quantityInput.value);
+            // Ensure value doesn't exceed the maximum allowed (stock)
+            if (currentValue < parseInt(quantityInput.max)) {
+                quantityInput.value = currentValue + 1;
+            }
+        });
+    }
+
+
+
+
 </script>
 @endpush

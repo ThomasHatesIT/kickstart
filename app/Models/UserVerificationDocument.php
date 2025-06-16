@@ -14,7 +14,7 @@ class UserVerificationDocument extends Model
     'document_type',
 ];
 
-// Add the inverse relationship
+
 public function user()
 {
     return $this->belongsTo(User::class);

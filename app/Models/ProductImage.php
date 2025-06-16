@@ -9,7 +9,7 @@ class ProductImage extends Model
 {
     use HasFactory;
 
-    // VERY IMPORTANT: Add the fillable property!
+
     protected $fillable = [
         'product_id',
         'image_path',

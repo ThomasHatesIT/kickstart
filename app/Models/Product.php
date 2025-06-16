@@ -32,7 +32,7 @@ class Product extends Model
         'material',
         'category_id',
 
-         // ADD THESE THREE LINES
+  
         'slug',
         'seller_id',
         'status',
