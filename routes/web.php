@@ -2,46 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 
-// General & Authentication Controllers
+
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RegisterUserController;
 use App\Http\Controllers\SessionController;
-
-// Main Feature Controllers
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
-
-// User-Specific Controllers (Aliased)
 use App\Http\Controllers\User\OrderController as UserOrderController;
-
-// Seller-Specific Controllers (Aliased)
 use App\Http\Controllers\Seller\SellerDashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\SellerOrderController as SellerOrderController;
 use App\Http\Controllers\SellerProductController as SellerProductController;
-
-// Admin-Specific Controllers (Aliased)
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| The routes are ordered by specificity:
-| 1. Static public routes.
-| 2. Grouped, prefixed routes (user, seller, admin).
-| 3. Dynamic "catch-all" routes at the very end.
-|
-*/
-
-
-// ========================================================================
-// 1. PUBLIC & AUTHENTICATION ROUTES
-// ========================================================================
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -57,9 +33,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
 
 
-// ========================================================================
-// 2. LOGGED-IN USER & CART ROUTES
-// ========================================================================
+
 
 Route::middleware('auth')->group(function () {
     // Cart Routes
@@ -74,10 +48,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 });
 
-
-// ========================================================================
-// 3. ROLE-SPECIFIC GROUPED ROUTES
-// ========================================================================
 
 // Logged-in Buyer/User Specific Routes
 Route::middleware(['auth'])->prefix('user')->name('users.')->group(function () {
@@ -120,22 +90,12 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
 // Admin Routes (requires admin role)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-        // NEW Order Management Routes
-
-
-
-
-
+        // NEW Order Management Route
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::patch('/orders/{order}', [AdminOrderController::class, 'updateStatus'])->name('orders.update');
 
-
     // Admin User Management
-
-
-
-
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
     Route::patch('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
@@ -150,12 +110,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('products.show');
     Route::patch('/products/{product}/approve', [AdminProductController::class, 'approve'])->name('products.approve');
     Route::patch('/products/{product}/reject', [AdminProductController::class, 'reject'])->name('products.reject');
+    Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
 });
 
 
-// ========================================================================
-// 4. CATCH-ALL DYNAMIC ROUTE (MUST BE LAST)
-// ========================================================================
+
 
 // This route handles product detail pages, e.g., /air-jordan-1
 Route::get('/{product}', [HomeController::class, 'show'])->name('show');

@@ -5,13 +5,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Support\Facades\Storage; 
 class AdminProductController extends Controller
 {
-    /**
-     * Display a listing of all products for the admin.
-     * Can be filtered by status or searched by name/seller.
-     */
-   // app/Http/Controllers/Admin/ProductController.php
+    
 
 public function index(Request $request)
 {
@@ -83,5 +80,24 @@ public function index(Request $request)
         // TODO: Optionally send an email notification to the seller with a reason for rejection.
 
         return redirect()->back()->with('warning', "Product '{$product->name}' has been rejected.");
+    }
+
+
+  public function destroy(Product $product)
+    {
+        $productName = $product->name;
+
+        if ($product->images()->exists()) {
+            foreach ($product->images as $image) {
+                // Now this line will work correctly
+                Storage::disk('public')->delete($image->image_path);
+                $image->delete();
+            }
+        }
+
+        $product->delete();
+
+        return redirect()->route('admin.products.index')
+                         ->with('success', "Product '{$productName}' has been successfully deleted.");
     }
 }

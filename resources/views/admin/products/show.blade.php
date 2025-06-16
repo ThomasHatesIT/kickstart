@@ -11,6 +11,16 @@
                 <p class="mb-0 opacity-75">Complete information about {{ $product->name }}</p>
             </div>
             <div class="d-flex gap-2">
+
+                <!-- ========== START: DELETE BUTTON FORM ========== -->
+                <form action="{{ route('admin.products.destroy', $product) }}" method="POST" onsubmit="return confirm('Are you absolutely sure you want to delete this product? This action cannot be undone.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        <i class="bi bi-trash3-fill me-2"></i> Delete Product
+                    </button>
+                </form>
+                <!-- ========== END: DELETE BUTTON FORM ========== -->
               
                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline-light btn-lg">
                     <i class="bi bi-arrow-left me-2"></i> Back to List
@@ -29,21 +39,20 @@
                             <i class="bi bi-box-seam text-primary fs-4"></i>
                         </div>
                         <div class="mb-4">
-    <!-- Product Name -->
-    <h3 class="mb-1 text-dark">{{ $product->name }}</h3>
-    
-    <!-- Subtitle -->
-    <p class="text-muted">Product Information & Details</p>
+                            <!-- Product Name -->
+                            <h3 class="mb-1 text-dark">{{ $product->name }}</h3>
+                            
+                            <!-- Subtitle -->
+                            <p class="text-muted">Product Information & Details</p>
 
-    <!-- Seller Info -->
-    <div class="d-flex align-items-center gap-2">
-        <p class="text-muted mb-0">Product Seller:</p>
-        <a href="{{ route('admin.users.show', $product->seller->id) }}" class="btn btn-outline-dark btn-sm">
-            View Seller
-        </a>
-    </div>
-</div>
-
+                            <!-- Seller Info -->
+                            <div class="d-flex align-items-center gap-2">
+                                <p class="text-muted mb-0">Product Seller:</p>
+                                <a href="{{ route('admin.users.show', $product->seller->id) }}" class="btn btn-outline-dark btn-sm">
+                                    View Seller
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -60,17 +69,16 @@
                         </div>
 
                         <!-- Category -->
-                       <!-- Category -->
-<div class="col-md-6">
-    <div class="info-item">
-        <label class="form-label text-uppercase fw-semibold text-muted small mb-2 d-block">
-            <i class="bi bi-folder me-1"></i> Category
-        </label>
-        <span class="badge bg-info bg-opacity-15 text-white fs-6 px-3 py-2 rounded-pill d-inline-block">
-            {{ $product->category->name ?? 'N/A' }}
-        </span>
-    </div>
-</div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="form-label text-uppercase fw-semibold text-muted small mb-2 d-block">
+                                    <i class="bi bi-folder me-1"></i> Category
+                                </label>
+                                <span class="badge bg-info bg-opacity-15 text-info-emphasis fs-6 px-3 py-2 rounded-pill d-inline-block">
+                                    {{ $product->category->name ?? 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
 
                         <!-- Price -->
                         <div class="col-md-6">
@@ -198,18 +206,15 @@
                 </div>
                 
                 <div class="card-body p-4 text-center">
-                    @php
-                        $primaryImage = $product->images->firstWhere('is_primary', true);
-                    @endphp
+                  @php
+                    $primaryImage = $product->images->firstWhere('is_primary', true);
+                @endphp
                     @if($primaryImage)
                         <div class="position-relative d-inline-block">
                             <img src="{{ Storage::url($primaryImage->image_path) }}" 
                                  alt="{{ $product->name }}" 
                                  class="img-fluid rounded-4 shadow-sm border"
                                  style="max-height: 400px; object-fit: cover;">
-                            <div class="position-absolute top-0 end-0 m-2">
-                                <span class="badge bg-primary">Primary</span>
-                            </div>
                         </div>
                         <p class="text-muted mt-3 mb-3 small">{{ $product->name }} - Primary Image</p>
                     @else
@@ -218,7 +223,7 @@
                                 <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
                             </div>
                             <h6 class="mt-3 text-muted">No Image Available</h6>
-                            <p class="text-muted small mb-3">No primary image has been uploaded for this product.</p>
+                            <p class="text-muted small mb-3">No image has been uploaded for this product.</p>
                         </div>
                     @endif
 
@@ -235,14 +240,14 @@
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-success shadow-sm flex-fill" onclick="return confirm('Are you sure you want to approve this product?')">
-                                        <i class="bi bi-check-circle me-2"></i> Approve Product
+                                        <i class="bi bi-check-circle me-2"></i> Approve
                                     </button>
                                 </form>
                                 <form action="{{ route('admin.products.reject', $product) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-danger shadow-sm flex-fill" onclick="return confirm('Are you sure you want to reject this product?')">
-                                        <i class="bi bi-x-circle me-2"></i> Reject Product
+                                    <button type="submit" class="btn btn-warning shadow-sm flex-fill" onclick="return confirm('Are you sure you want to reject this product?')">
+                                        <i class="bi bi-x-circle me-2"></i> Reject
                                     </button>
                                 </form>
                             </div>
@@ -258,38 +263,27 @@
         .bg-gradient-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
         .info-item {
             padding: 1rem 0;
-            border-bottom: 1px solid #f8f9fa;
+            border-bottom: 1px solid #f0f2f5;
         }
-        
         .info-item:last-child {
             border-bottom: none;
         }
-        
         .card {
             transition: all 0.3s ease;
         }
-        
-        .card:hover {
-            transform: translateY(-2px);
-        }
-        
         .btn {
-            transition: all 0.3s ease;
+            transition: all 0.2s ease-in-out;
         }
-        
         .btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
         }
-        
         .badge {
             font-weight: 500;
         }
-        
-        .img-fluid:hover {
-            transform: scale(1.02);
+        .img-fluid {
             transition: transform 0.3s ease;
         }
     </style>

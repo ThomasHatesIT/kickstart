@@ -1,67 +1,78 @@
-<?php 
+<?php
 
-namespace App\Http\Controllers; 
+namespace App\Http\Controllers;
 
-use Spatie\Permission\Models\Permission; 
-use Spatie\Permission\Models\Role; 
+use Spatie\Permission\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Validation\Rule;
 
-use Illuminate\Http\Request; 
-use Illuminate\Support\Facades\Hash; 
-use Illuminate\Validation\Rules\Password; 
-use Illuminate\Support\Facades\Auth; 
-use App\Models\User; 
+class RegisterUserController extends Controller
+{
+    public function index()
+    {
+        $roles = Role::all();
+        return view('auth.register', ['roles' => $roles]);
+    }
 
-class RegisterUserController extends Controller 
-{ 
-    public function index(){
-        $roles = Role::all(); 
-        return view('auth.register', [  
-            'roles' => $roles 
-        ]); 
-    } 
-
-      public function store(Request $request)
+    public function store(Request $request)
     {
         // 1. VALIDATE THE INCOMING REQUEST
         $attributes = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::min(8)],
-            'role'     => ['required', 'string', 'exists:roles,name'],
+            'name'                  => ['required', 'string', 'max:255'],
+            'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password'              => ['required', 'confirmed', Password::min(8)],
+            'role'                  => ['required', 'string', 'exists:roles,name'],
+            'profile_photo'         => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // For general profile picture
+            
+            // These fields are only required if the user registers as a seller.
+            'face_photo'            => ['required_if:role,seller', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'id_photo_front'        => ['required_if:role,seller', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
 
-        // 2. CREATE THE USER
-        // Determine the user's initial status based on their role
-        $status = $attributes['role'] === 'seller' ? 'pending' : 'approved';
-
-        $user = User::create([
+        // 2. HANDLE FILE UPLOADS
+        $userPayload = [
             'name'     => $attributes['name'],
             'email'    => $attributes['email'],
             'password' => Hash::make($attributes['password']),
-            'status'   => $status,
-        ]);
+            'status'   => $attributes['role'] === 'seller' ? 'pending' : 'approved',
+        ];
+        
+        // Handle optional profile photo
+        if ($request->hasFile('profile_photo')) {
+            $userPayload['profile_photo_path'] = $request->file('profile_photo')->store('profile-photos', 'public');
+        }
 
-        // 3. ASSIGN THE ROLE TO THE NEW USER
+        // Handle required seller-specific photos
+        if ($attributes['role'] === 'seller') {
+            $userPayload['face_photo_path'] = $request->file('face_photo')->store('verification/faces', 'public');
+        }
+
+        // 3. CREATE THE USER
+        $user = User::create($userPayload);
+
+        // 4. UPLOAD VERIFICATION DOCUMENT (ID FRONT) IF SELLER
+        if ($attributes['role'] === 'seller') {
+            $idPhotoPath = $request->file('id_photo_front')->store('verification/documents', 'public');
+            $user->verificationDocuments()->create([
+                'document_path' => $idPhotoPath,
+                'document_type' => 'id_front',
+            ]);
+        }
+        
+        // 5. ASSIGN THE ROLE
         $user->assignRole($attributes['role']);
-
-        // 4. HANDLE CONDITIONAL LOGIN AND REDIRECT
-        // This is the clean, logical way to handle the flow.
-
+        
+        // 6. HANDLE CONDITIONAL LOGIN AND REDIRECT
         if ($user->hasRole('seller')) {
-            // A seller's account is pending, so DO NOT log them in.
-            // Redirect them to the login page with a success message.
-            return redirect('/login')
-                ->with('success', 'Registration successful! Your account is pending admin approval. You will be notified via email once it is approved.');
+            return redirect('/login')->with('success', 'Registration successful! Your seller account is now pending admin approval.');
         } else {
-            // For any other role (e.g., 'buyer'), log them in immediately.
             Auth::login($user);
-
-            // Regenerate the session ID for security (prevents session fixation)
             $request->session()->regenerate();
-
-            // Redirect the newly logged-in user directly to the homepage.
-            return redirect('/')
-                ->with('success', 'Welcome! You have been registered and successfully logged in.');
+            return redirect('/')->with('success', 'Welcome! You have registered and logged in.');
         }
     }
 }

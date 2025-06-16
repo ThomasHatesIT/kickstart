@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 class AdminUserController extends Controller
