@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RegisterUserController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\BrowseProductsController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\User\OrderController as UserOrderController;
@@ -17,7 +18,11 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
 
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// All public product browsing routes should be together and early.
+Route::get('/products', [BrowseProductsController::class, 'index'])->name('browse-products.index'); // Renamed for consistency
+Route::get('/products/{product}', [BrowseProductsController::class, 'show'])->name('products.show'); // Using ID now
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -116,5 +121,3 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 
 
-// This route handles product detail pages, e.g., /air-jordan-1
-Route::get('/{product}', [HomeController::class, 'show'])->name('show');

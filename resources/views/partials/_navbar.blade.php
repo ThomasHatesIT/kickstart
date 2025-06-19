@@ -21,7 +21,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="">
+                    <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{route('browse-products.index')}}">
                         <i class="fas fa-th-large me-1"></i>Products
                     </a>
                 </li>
