@@ -146,19 +146,18 @@
 </head>
 <body>
     <div id="app">
-        {{-- Include the main navigation bar partial --}}
+
         @include('partials._navbar')
 
-        {{-- Main content wrapper with flex-grow --}}
+
         <main class="main-content">
-            {{-- Display any session messages/alerts --}}
+
             @include('partials._alerts')
 
-            {{-- The main content of each page will be injected here --}}
+
             @yield('content')
         </main>
 
-        {{-- Include the footer partial - it will stick to bottom --}}
         @include('partials._footer')
     </div>
 

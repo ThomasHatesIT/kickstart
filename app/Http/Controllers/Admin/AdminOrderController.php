@@ -24,7 +24,7 @@ class AdminOrderController extends Controller
               });
     }
 
-    // ADD THIS SECTION FOR DATE FILTERING
+
     if (request('status')) {
         $query->where('status', request('status'));
     }
@@ -38,7 +38,7 @@ class AdminOrderController extends Controller
     }
     // END OF DATE FILTERING SECTION
 
-    $orders = $query->paginate(20);
+    $orders = $query->paginate(5);
 
     return view('admin.orders.index', compact('orders'));
 }

@@ -16,6 +16,19 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Auth\GoogleController;
+use Laravel\Socialite\Facades\Socialite;
+
+   Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.ToGoogle');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallBack'])->name('google.callback');
+
+
+
+
+
+
+
+
 
 
 

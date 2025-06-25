@@ -241,23 +241,23 @@
             </div>
             
             {{-- Enhanced Pagination --}}
-            @if($orders->hasPages())
-            <div class="card-footer bg-white border-top-0">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <small class="text-muted">
-                            Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} 
-                            of {{ $orders->total() }} results
-                        </small>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-end">
-                            {{ $orders->withQueryString()->links() }}
+          
+
+
+                   <!-- Enhanced Footer with Pagination -->
+    
+                @if($orders->hasPages())
+                    <div class="card-footer bg-white border-top py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="text-muted mb-2 mb-md-0">
+                                Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }} results
+                            </div>
+                            <div>
+                                {{ $orders->links('pagination::bootstrap-5') }}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            @endif
+                @endif
         </div>
     </div>
 </div>

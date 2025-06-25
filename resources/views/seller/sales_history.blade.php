@@ -32,8 +32,8 @@
                                     </td>
                                     <td>{{ $sale->product->name }}</td>
                                     <td>{{ $sale->quantity }}</td>
-                                    <td>€{{ number_format($sale->price, 2) }}</td>
-                                    <td><strong>€{{ number_format($sale->price * $sale->quantity, 2) }}</strong></td>
+                                    <td>₱{{ number_format($sale->price, 2) }}</td>
+                                    <td><strong>₱{{ number_format($sale->price * $sale->quantity, 2) }}</strong></td>
                                 </tr>
                             @endforeach
                         </tbody>
