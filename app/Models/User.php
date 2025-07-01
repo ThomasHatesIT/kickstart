@@ -21,19 +21,17 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'profile_photo_path', // Add this
-    'face_photo_path',    // Add this
-    'status',
-    'phone',
-    'address',
-     'google_id',
-
-
-];
+ protected $fillable = [
+        'name',
+        'email',
+        'password',
+        // 'profile_photo_path', // REMOVE THIS
+        // 'face_photo_path',    // REMOVE THIS
+        'status',
+        'phone',
+        'address',
+        'google_id',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -80,10 +78,8 @@ class User extends Authenticatable
     {
         return $this->status === 'banned';
     }
-    public function verificationDocuments(): HasMany
+ public function verificationDocuments(): HasMany
     {
-        // This tells Laravel that a User can have many UserVerificationDocument records,
-        // linked by the 'user_id' foreign key.
         return $this->hasMany(UserVerificationDocument::class);
     }
 }
