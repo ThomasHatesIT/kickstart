@@ -20,9 +20,28 @@ use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Auth\GoogleController;
 use Laravel\Socialite\Facades\Socialite;
 
-   Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.ToGoogle');
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallBack'])->name('google.callback');
 
+
+
+
+// Routes for the multi-step Google Registration flow
+Route::middleware('guest')->group(function() {
+    // Step 1: Show the role selection page
+    Route::get('/auth/google/select-role', [GoogleController::class, 'showRoleSelectionForm'])->name('google.register.role');
+    
+    // Step 2: Process the role choice. (Sellers get redirected to the next step)
+    Route::post('/auth/google/process-role', [GoogleController::class, 'processRoleSelection'])->name('google.process.role');
+
+    // Step 3 (Sellers only): Show the document upload form
+    Route::get('/auth/google/seller-documents', [GoogleController::class, 'showSellerDocumentsForm'])->name('google.seller.documents.form');
+    
+    // Step 4 (Sellers only): Store the documents and create the user
+    Route::post('/auth/google/seller-documents', [GoogleController::class, 'storeSellerFromGoogle'])->name('google.seller.documents.store');
+});
+
+// Main Google Authentication routes
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.ToGoogle');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallBack'])->name('google.callback');
 
 
 

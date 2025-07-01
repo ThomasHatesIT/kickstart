@@ -65,7 +65,7 @@
             </div>
             
           <!-- Using an <a> tag styled as a button -->
-<a href="{{ route('show', $product) }}" 
+<a href="{{ route('products.show', $product) }}" 
    role="button"
    class="btn btn-primary w-100 py-2 fw-semibold rounded-2 add-to-cart-btn" 
    style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border: none; transition: all 0.3s ease;">
