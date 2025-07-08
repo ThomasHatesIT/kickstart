@@ -272,10 +272,10 @@
     }
 
     /* Google button hover effect */
-    .btn-outline-dark:hover {
-        background-color: #f8f9fa;
-        border-color: #667eea !important;
-    }
+ .btn-outline-dark:hover {
+    background-color: black; /* slightly brighter than #f8f9fa */
+}
+
 
     /* Card animation on load */
     .card {
