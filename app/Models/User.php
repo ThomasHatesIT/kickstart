@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Review; // Add this at the top
+use App\Models\Review; 
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\CartItem; // Add this
+use App\Models\CartItem; 
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
@@ -25,12 +25,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        // 'profile_photo_path', // REMOVE THIS
-        // 'face_photo_path',    // REMOVE THIS
+  
         'status',
         'phone',
         'address',
         'google_id',
+          'email_verified_at', 
     ];
 
     /**

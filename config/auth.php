@@ -62,7 +62,8 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            // Make sure THIS line points to your User model
+        'model' => App\Models\User::class,
         ],
 
         // 'users' => [

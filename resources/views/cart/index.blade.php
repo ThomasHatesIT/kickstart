@@ -81,7 +81,7 @@
                                     {{-- Product Details --}}
                                     <div class="col-md-5 col-lg-6">
                                         <div class="product-details">
-                                            <a href="{{ route('show', $item->product) }}" class="text-decoration-none">
+                                            <a href="{{ route('cart.index', $item->product) }}" class="text-decoration-none">
                                                 <h5 class="fw-bold mb-2 text-dark hover-primary">{{ $item->product->name }}</h5>
                                             </a>
                                             <div class="product-meta">

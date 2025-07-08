@@ -28,39 +28,61 @@ class GoogleController extends Controller
      * Obtain the user information from Google.
      */
     public function handleGoogleCallBack()
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
-            $user = User::where('google_id', $googleUser->getId())->orWhere('email', $googleUser->getEmail())->first();
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
+        $user = User::where('google_id', $googleUser->getId())->orWhere('email', $googleUser->getEmail())->first();
 
-            if ($user) {
-                // This is an existing user. Check their status before logging in.
-                if (is_null($user->google_id)) {
-                    $user->update(['google_id' => $googleUser->getId()]);
-                }
-                if ($user->status === 'approved') {
-                    Auth::login($user);
-                    return redirect()->route('home');
-                }
+        if ($user) {
+            // This is an existing user.
+            if (is_null($user->google_id)) {
+                $user->update(['google_id' => $googleUser->getId()]);
+            }
+
+            // --- START: Status Checks (This part is already correct) ---
+            if ($user->status !== 'approved') {
                 if ($user->status === 'pending') {
                     return redirect()->route('login')->with('error', 'Your account is pending approval. You cannot log in until it is reviewed.');
                 }
+                if ($user->status === 'banned') {
+                    return redirect()->route('login')->with('error', 'This account has been suspended.');
+                }
+                // For any other non-approved status
                 return redirect()->route('login')->with('error', 'Your account is not active. Please contact support.');
             }
+            // --- END: Status Checks ---
 
-            // This is a new user. Start the multi-step registration process.
-            session(['google_user' => [
-                'id'    => $googleUser->getId(),
-                'name'  => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-            ]]);
-            return redirect()->route('google.register.role');
+            // --- THIS IS THE NEW REDIRECTION LOGIC ---
+            // If the status is 'approved', log them in and redirect based on role.
+            Auth::login($user);
+            request()->session()->regenerate(); // It's good practice to regenerate the session.
+            
+            if ($user->hasRole('admin')) {
+                return redirect()->intended(route('admin.dashboard'));
+            }
+            if ($user->hasRole('seller')) {
+                return redirect()->intended(route('seller.dashboard'));
+            }
 
-        } catch (Exception $e) {
-            Log::error('Google Login Error: ' . $e->getMessage());
-            return redirect()->route('login')->with('error', 'Something went wrong during Google sign-in. Please try again.');
+            // Default redirect for buyers or any other approved roles
+            return redirect()->intended(route('home'));
+            // --- END OF NEW LOGIC ---
         }
+
+        // This is a new user, start the multi-step registration process.
+        // This part remains unchanged.
+        session(['google_user' => [
+            'id'    => $googleUser->getId(),
+            'name'  => $googleUser->getName(),
+            'email' => $googleUser->getEmail(),
+        ]]);
+        return redirect()->route('google.register.role');
+
+    } catch (Exception $e) {
+        Log::error('Google Login Error: ' . $e->getMessage());
+        return redirect()->route('login')->with('error', 'Something went wrong during Google sign-in. Please try again.');
     }
+}
 
     /**
      * Show the view where the user selects their role.

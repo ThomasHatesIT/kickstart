@@ -42,6 +42,6 @@ class BrowseProductsController extends Controller
         // Load all relationships needed for the detail page.
         $product->load(['category', 'seller', 'images']);
 
-        return view('products.show', compact('product'));
+        return view('home.show', compact('product'));
     }
 }

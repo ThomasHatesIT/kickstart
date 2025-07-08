@@ -24,49 +24,31 @@ use Laravel\Socialite\Facades\Socialite;
 
 
 
-// Routes for the multi-step Google Registration flow
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.ToGoogle');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallBack'])->name('google.callback');
 Route::middleware('guest')->group(function() {
-    // Step 1: Show the role selection page
     Route::get('/auth/google/select-role', [GoogleController::class, 'showRoleSelectionForm'])->name('google.register.role');
-    
-    // Step 2: Process the role choice. (Sellers get redirected to the next step)
     Route::post('/auth/google/process-role', [GoogleController::class, 'processRoleSelection'])->name('google.process.role');
-
-    // Step 3 (Sellers only): Show the document upload form
     Route::get('/auth/google/seller-documents', [GoogleController::class, 'showSellerDocumentsForm'])->name('google.seller.documents.form');
-    
-    // Step 4 (Sellers only): Store the documents and create the user
     Route::post('/auth/google/seller-documents', [GoogleController::class, 'storeSellerFromGoogle'])->name('google.seller.documents.store');
 });
 
-// Main Google Authentication routes
-Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.ToGoogle');
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallBack'])->name('google.callback');
 
-
-
-
-
-
-
-
+Auth::routes(['verify' => true]); 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
-// All public product browsing routes should be together and early.
 Route::get('/products', [BrowseProductsController::class, 'index'])->name('browse-products.index'); // Renamed for consistency
 Route::get('/products/{product}', [BrowseProductsController::class, 'show'])->name('products.show'); // Using ID now
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Auth routes for guests
+
+
+
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
     Route::post('/register', [RegisterUserController::class, 'store']);
     Route::get('/login', [SessionController::class, 'index'])->name('login');
     Route::post('/login', [SessionController::class, 'store']);
 });
-
-// Logout requires authentication
 Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
 
 
@@ -149,6 +131,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/products/{product}/reject', [AdminProductController::class, 'reject'])->name('products.reject');
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
 });
+
 
 
 
